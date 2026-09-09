@@ -1,0 +1,12 @@
+By Dzaky
+
+library tailwindcss untuk styling
+
+Susunan folder view ada 5
+1. folder auth = kumpulan view untuk authentifikasi (dipisah karena mungkin style layout berbeda dengan dashboard)
+2. folder admin = kumpulan view untuk dashboard admin
+3. folder penghuni = kumpulan view untuk dashboard penghuni
+4. folder layout = kumpulan view untuk html utama
+5. folder partial = kumpulan komponen yang mungkin bisa reusable misalnya popup form
+
+pake fungsi blade bawaan laravel seperti @extends, @section, @yield, @include, dll
