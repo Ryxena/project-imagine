@@ -1,0 +1,11 @@
+$kind: http-request
+url: "{{host}}/admin/kamar"
+method: PUT
+headers:
+  Accept: application/json
+  Content-Type: application/json
+  X-XSRF-TOKEN: "{{xsrf-token}}"
+body:
+  type: json
+  content: ""
+order: 2679466495050537

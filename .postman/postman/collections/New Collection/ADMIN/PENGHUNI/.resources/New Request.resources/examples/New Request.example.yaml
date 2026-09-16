@@ -1,0 +1,124 @@
+$kind: http-example
+request:
+  url: "{{host}}/admin/penghuni"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    - key: host
+      value: 127.0.0.1:8000
+    - key: connection
+      value: close
+    - key: x-powered-by
+      value: PHP/8.4.16
+    - key: cache-control
+      value: no-cache, private
+    - key: date
+      value: Wed, 16 Sep 2026 11:48:42 GMT
+    - key: content-type
+      value: application/json
+    - key: set-cookie
+      value: XSRF-TOKEN=eyJpdiI6Ijd5RW5nU2hUSEdHdDl0dGd5WnQ4Znc9PSIsInZhbHVlIjoiaVR5QUdudGFCcEx4cmFOSkhDNy9obmZzSzkwclVoWm5sQWsxNHcwNXVhVEsrTFdHL1RObnk1SjhjZjNTMTU0bDRUM3ZXSGlHTklHZFAzZ0ZYTk9FWlMwTVQ3QzNhaHU4clAxNnpxWGMzRUpkZExFdmY5cjBEZ2pZLy9OOWZkTkEiLCJtYWMiOiJmNDE1ZTk4ZDRkZGZhNjI1MjI2ZjJiNWRlZjhkZTMwOGEwNTFmMWM0ZjIwNWMzNjg1YWUyOGM2Mjc1YTQ2OThiIiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:48:42 GMT; Max-Age=7200; path=/; samesite=lax
+    - key: set-cookie
+      value: laravel-session=eyJpdiI6IjFEaW9LNVc1a3p6WWZKMm1TSUl0U0E9PSIsInZhbHVlIjoiL3czTUtZRUFDVExwWDZnT3hPM0UvZ0oxdjhiSmN4emwzcStsMXJTZmNMWDhlYVBRVWhXd1VOUE96ZENNVHZIeVVwM2hvdlJ6TmcyTTIvNVFkdWcrcGZmOXEwcDNCdUFrWVczYTRCazNWUjlrMGdxNjRlczlzMHhXdk1FSG9aRHUiLCJtYWMiOiIxYTk1OTI5NjJlN2E0MWFjMTcxMTk5M2MxN2VkMDIxNDQxZDg1OTUzNzMxNWI3NmU1OGJlOTQ3N2NlNGVkNGU0IiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:48:42 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Data penghuni berhasil diambil.",
+        "data": [
+          {
+            "id": 1,
+            "user_id": 2,
+            "last_kamar_id": 1,
+            "kamar_id": 1,
+            "image": null,
+            "name": "Budi Santoso",
+            "email": "budi@imagine.test",
+            "no_hp": "+19253462583",
+            "status": "aktif",
+            "nomor_kamar": "A101",
+            "tipe_kamar": "standar",
+            "harga": "750000.00",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null,
+            "created_at": "2026-09-16T11:02:47.000000Z",
+            "updated_at": "2026-09-16T11:02:47.000000Z"
+          },
+          {
+            "id": 2,
+            "user_id": 3,
+            "last_kamar_id": 2,
+            "kamar_id": 2,
+            "image": null,
+            "name": "Siti Rahma",
+            "email": "siti@imagine.test",
+            "no_hp": "+1 (541) 344-6242",
+            "status": "aktif",
+            "nomor_kamar": "A102",
+            "tipe_kamar": "standar",
+            "harga": "750000.00",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null,
+            "created_at": "2026-09-16T11:02:47.000000Z",
+            "updated_at": "2026-09-16T11:02:47.000000Z"
+          },
+          {
+            "id": 3,
+            "user_id": 4,
+            "last_kamar_id": 3,
+            "kamar_id": 3,
+            "image": null,
+            "name": "Andi Wijaya",
+            "email": "andi@imagine.test",
+            "no_hp": "(254) 882-8117",
+            "status": "aktif",
+            "nomor_kamar": "B201",
+            "tipe_kamar": "deluxe",
+            "harga": "1250000.00",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null,
+            "created_at": "2026-09-16T11:02:47.000000Z",
+            "updated_at": "2026-09-16T11:02:47.000000Z"
+          },
+          {
+            "id": 4,
+            "user_id": 5,
+            "last_kamar_id": null,
+            "kamar_id": null,
+            "image": null,
+            "name": "Rina Melati",
+            "email": "rina@imagine.test",
+            "no_hp": "+1.504.282.0239",
+            "status": "aktif",
+            "nomor_kamar": null,
+            "tipe_kamar": null,
+            "harga": null,
+            "tanggal_masuk": null,
+            "tanggal_checkout": null,
+            "created_at": "2026-09-16T11:02:47.000000Z",
+            "updated_at": "2026-09-16T11:02:47.000000Z"
+          },
+          {
+            "id": 5,
+            "user_id": 6,
+            "last_kamar_id": 5,
+            "kamar_id": null,
+            "image": null,
+            "name": "Dedi Kurnia",
+            "email": "dedi@imagine.test",
+            "no_hp": "(260) 829-9621",
+            "status": "aktif",
+            "nomor_kamar": null,
+            "tipe_kamar": null,
+            "harga": null,
+            "tanggal_masuk": "2025-09-01",
+            "tanggal_checkout": "2026-06-16",
+            "created_at": "2026-09-16T11:02:47.000000Z",
+            "updated_at": "2026-09-16T11:02:47.000000Z"
+          }
+        ]
+      }
+order: 1789559327462

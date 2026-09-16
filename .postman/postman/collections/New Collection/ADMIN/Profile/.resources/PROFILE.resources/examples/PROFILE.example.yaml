@@ -1,0 +1,43 @@
+$kind: http-example
+request:
+  url: "{{host}}/admin/profile"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    - key: host
+      value: 127.0.0.1:8000
+    - key: connection
+      value: close
+    - key: x-powered-by
+      value: PHP/8.4.16
+    - key: cache-control
+      value: no-cache, private
+    - key: date
+      value: Wed, 16 Sep 2026 11:47:03 GMT
+    - key: content-type
+      value: application/json
+    - key: set-cookie
+      value: XSRF-TOKEN=eyJpdiI6InRMSDZzbnQxdkM3UzdPUFYxbXhuMlE9PSIsInZhbHVlIjoiSzFVS09Hdzc5WkhUeWozVERldFhrNlMydWpvSnhWNTB5cXhXZk5reGZ5RzFYWGNUaUxYbkxNaXVnUG0xZ0tDK256QUNwYXdYdXRDd0dHUWpIc0Y1bWM0SFp2N3drQzV2d1M3bjh0Z0RhWmJ5YktmNW8rait2NnRsVWI4OVVTNmwiLCJtYWMiOiI5NTMyYWVjMTk1MmIwYjZiNTdiODA3MTExYzc4MDdlZWM2NGU0MmE4NWM2Y2Y3ZWNjZmJjMjE4NTk4MDU5Y2EyIiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:47:03 GMT; Max-Age=7200; path=/; samesite=lax
+    - key: set-cookie
+      value: laravel-session=eyJpdiI6ImVSYWxxRHB2a1FzM2FwVWIvcjd0SEE9PSIsInZhbHVlIjoicnRwUlI1Q0doMTNpUWFlNUtPcVBRUFhHWk1LNHpwbDArenAwaVU1UE1pYWxNRTVZd2tieFJDeEN5eis0aVl4Q1hJUEVLOWxxZUdUVFJCUGZ0VnNHL2VBeFh6eFhianRLZGVJUm9sNHloQVpTNUkwYkRHMTVqYnAvbHJFdk1ZTnIiLCJtYWMiOiI4M2IxY2RhMTNlYzdmMWIyMTQzNmQ3NzI3YmUwNGRkNWY3ZmRjZTBiYjU0MGM3MDdhMTdjYmMzZTQ5ODYxNGI2IiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:47:03 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+  body:
+    type: json
+    content: |-
+      {
+        "message": "Profile berhasil diambil.",
+        "data": {
+          "user": {
+            "id": 1,
+            "name": "Admin Kos",
+            "email": "admin@imagine.test",
+            "no_hp": "(484) 910-0358",
+            "image": null,
+            "role": "super_admin",
+            "status": "aktif"
+          },
+          "penghunian": []
+        }
+      }
+order: 1789559333090

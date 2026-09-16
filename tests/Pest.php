@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /*
@@ -15,7 +16,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +45,19 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+function buktiImage(string $name = 'bukti.png'): UploadedFile
 {
-    // ..
+    // PNG 1x1 pixel asli, supaya lolos validasi image tanpa ekstensi GD.
+    return UploadedFile::fake()->createWithContent(
+        $name,
+        base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==')
+    );
+}
+
+function buktiPdf(): UploadedFile
+{
+    return UploadedFile::fake()->createWithContent(
+        'bukti.pdf',
+        "%PDF-1.4\n1 0 obj\nendobj\ntrailer\n<</Root 1 0 R>>\nstartxref\n0\n%%EOF\n"
+    );
 }
