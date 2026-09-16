@@ -1,0 +1,28 @@
+$kind: collection
+variables:
+  host: ""
+  xsrf-token: ""
+scripts:
+  - type: http:beforeRequest
+    code: "pm.sendRequest({\r
+
+      \    url: 'http://127.0.0.1:8000/sanctum/csrf-cookie',\r
+
+      \    method: 'GET'\r
+
+      }, function (error, response, {cookies}) {\r
+
+      \    if (!error) {\r
+
+      \        var xsrfCookie = cookies.get('XSRF-TOKEN');\r
+
+      \        if (xsrfCookie) {\r
+
+      \            pm.collectionVariables.set('xsrf-token', decodeURIComponent(xsrfCookie));\r
+
+      \        }\r
+
+      \    }\r
+
+      });"
+    language: text/javascript

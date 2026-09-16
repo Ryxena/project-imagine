@@ -1,0 +1,84 @@
+$kind: http-example
+request:
+  url: "{{host}}/admin/kamar"
+  method: GET
+response:
+  statusCode: 200
+  statusText: OK
+  headers:
+    - key: host
+      value: 127.0.0.1:8000
+    - key: connection
+      value: close
+    - key: x-powered-by
+      value: PHP/8.4.16
+    - key: cache-control
+      value: no-cache, private
+    - key: date
+      value: Wed, 16 Sep 2026 11:52:27 GMT
+    - key: content-type
+      value: application/json
+    - key: set-cookie
+      value: XSRF-TOKEN=eyJpdiI6ImVhTmRoaVRNOEN2eWc2UGRUUy9YOEE9PSIsInZhbHVlIjoiRGpjZ0dMcTBVUlZRVXVLVm1zV2ROekdKTEh2ZWxmUGJObzJpRHkwSmtrMTNQRjZ3V2VyalVnZFBQa0RCYXNHNzJyQXhxbWNlQ3M5bUx0cEdaaURQLzRqam1XU0ZiVWlpQ2Z0cDFkaUZJTTlia2xwV2U0cDM4TmVQTHo2N29rWkwiLCJtYWMiOiJmMzNlYTNhNTBmNDkxYzhiNjhmNjM2ZDNlZTFjOWRlM2YyYTU5ZWQzOWQ5MjNkN2M1YjgwYjczZjU5MGRmOGI5IiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:52:27 GMT; Max-Age=7200; path=/; samesite=lax
+    - key: set-cookie
+      value: laravel-session=eyJpdiI6Imc3enNvd28xZW5zYzFRb1FMWUN6Rmc9PSIsInZhbHVlIjoiNlA0T1Y0cEM0UXR4Q2hwZFVJSk5ROXlHcjNscjJFMXJjL1RNRFFkMlZaVFprNUlha3hZcGszRnVqN1pzMDdEdGM1aTkxbjFMRXUrVXBsVEV4WUdIL1haNGtidVNqSVFwSHJtSDB3NDU3TFRIc3hEMEorc0hmblR6bndEd1NXYVoiLCJtYWMiOiIwNzE0OWQxZWY1MDRiNDZiMjIzZWY3M2FjODE2ZmFkYWE4ZDBlNDgxN2M1MjI3ZTMzMzRkYzkzYzk1MWQwYzRkIiwidGFnIjoiIn0%3D; expires=Wed, 16 Sep 2026 13:52:27 GMT; Max-Age=7200; path=/; httponly; samesite=lax
+  body:
+    type: json
+    content: |-
+      {
+        "success": true,
+        "message": "Data kamar berhasil diambil.",
+        "data": [
+          {
+            "id": 1,
+            "nomor_kamar": "A101",
+            "tipe_kamar": "standar",
+            "harga": "750000.00",
+            "deskripsi": "Kamar standar lantai 1, kamar mandi luar.",
+            "name": "Budi Santoso",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null
+          },
+          {
+            "id": 2,
+            "nomor_kamar": "A102",
+            "tipe_kamar": "standar",
+            "harga": "750000.00",
+            "deskripsi": "Kamar standar lantai 1, dekat parkiran.",
+            "name": "Siti Rahma",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null
+          },
+          {
+            "id": 3,
+            "nomor_kamar": "B201",
+            "tipe_kamar": "deluxe",
+            "harga": "1250000.00",
+            "deskripsi": "Kamar deluxe lantai 2, kamar mandi dalam dan AC.",
+            "name": "Andi Wijaya",
+            "tanggal_masuk": "2026-06-01",
+            "tanggal_checkout": null
+          },
+          {
+            "id": 4,
+            "nomor_kamar": "B202",
+            "tipe_kamar": "deluxe",
+            "harga": "1250000.00",
+            "deskripsi": "Kamar deluxe lantai 2, dengan balkon.",
+            "name": null,
+            "tanggal_masuk": null,
+            "tanggal_checkout": null
+          },
+          {
+            "id": 5,
+            "nomor_kamar": "C301",
+            "tipe_kamar": "vip",
+            "harga": "2000000.00",
+            "deskripsi": "Kamar VIP lantai 3, full furniture dan AC.",
+            "name": null,
+            "tanggal_masuk": null,
+            "tanggal_checkout": null
+          }
+        ]
+      }
+order: 1789559549648

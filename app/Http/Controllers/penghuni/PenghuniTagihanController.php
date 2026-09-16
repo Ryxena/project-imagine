@@ -3,63 +3,63 @@
 namespace App\Http\Controllers\penghuni;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tagihan;
 use Illuminate\Http\Request;
 
 class PenghuniTagihanController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /penghuni/tagihan
+     *
+     * Menampilkan daftar tagihan milik user yang sedang login.
+     *
+     * Filter status pembayaran:
+     * /penghuni/tagihan?status=belum_bayar
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $status = $request->query('status');
+
+        $tagihans = Tagihan::query()
+            ->whereHas('penghunian', function ($query) use ($request) {
+                $query->where('user_id', $request->user()->id);
+            })
+            ->with([
+                'pembayaran',
+                'penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
+            ])
+            ->latest()
+            ->get()
+            ->when($status, function ($tagihans) use ($status) {
+                return $tagihans->where('status_pembayaran', $status)->values();
+            });
+
+        return response()->json([
+            'message' => 'Daftar tagihan berhasil diambil.',
+            'data' => $tagihans,
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * GET /penghuni/tagihan/{tagihan}
+     *
+     * Menampilkan detail tagihan milik user yang sedang login.
      */
-    public function create()
+    public function show(Request $request, string $id)
     {
-        //
-    }
+        $tagihan = Tagihan::query()
+            ->whereHas('penghunian', function ($query) use ($request) {
+                $query->where('user_id', $request->user()->id);
+            })
+            ->with([
+                'pembayaran',
+                'penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
+            ])
+            ->findOrFail($id);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'message' => 'Detail tagihan berhasil diambil.',
+            'data' => $tagihan,
+        ]);
     }
 }

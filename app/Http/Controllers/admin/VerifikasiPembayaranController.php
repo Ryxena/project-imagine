@@ -3,63 +3,155 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
+use App\Models\Pembayaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 
 class VerifikasiPembayaranController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * GET /admin/verifikasipembayaran
+     *
+     * Filter status verifikasi:
+     * /admin/verifikasipembayaran?status=pending
+     * Search nama penghuni:
+     * /admin/verifikasipembayaran?search=andi
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->query('search');
+        $status = $request->query('status');
+
+        $pembayarans = Pembayaran::query()
+            ->with([
+                'tagihan.penghunian.user:id,name,email,no_hp,image',
+                'tagihan.penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
+            ])
+            ->when($status, function ($query, $status) {
+                $query->where('status_verifikasi', $status);
+            })
+            ->when($search, function ($query) use ($search) {
+                $query->whereHas('tagihan.penghunian.user', function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%");
+                });
+            })
+            ->latest()
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data pembayaran berhasil diambil.',
+            'data' => $pembayarans,
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * GET /admin/verifikasipembayaran/{pembayaran}
      */
-    public function create()
+    public function show(Pembayaran $pembayaran)
     {
-        //
+        $pembayaran->load([
+            'tagihan.penghunian.user:id,name,email,no_hp,image',
+            'tagihan.penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Detail pembayaran berhasil diambil.',
+            'data' => $pembayaran,
+        ]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * PUT/PATCH /admin/verifikasipembayaran/{pembayaran}
+     *
+     * Verifikasi pembayaran:
+     * - status_verifikasi: success|failed
+     * - alasan_penolakan wajib jika ditolak (failed)
      */
-    public function store(Request $request)
+    public function update(Request $request, Pembayaran $pembayaran)
     {
-        //
+        if ($pembayaran->status_verifikasi !== 'pending') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Pembayaran ini sudah diverifikasi.',
+            ], 422);
+        }
+
+        $validated = $request->validate([
+            'status_verifikasi' => ['required', Rule::in(['success', 'failed'])],
+            'alasan_penolakan' => [
+                'nullable',
+                'string',
+                'max:255',
+                'required_if:status_verifikasi,failed',
+            ],
+        ]);
+
+        $pembayaran->update([
+            'status_verifikasi' => $validated['status_verifikasi'],
+            'alasan_penolakan' => $validated['alasan_penolakan'] ?? null,
+        ]);
+
+        $pembayaran->load('tagihan.penghunian.user');
+
+        $penerima = $pembayaran->tagihan->penghunian->user ?? null;
+
+        if ($penerima) {
+            if ($validated['status_verifikasi'] === 'success') {
+                Notification::create([
+                    'user_id' => $penerima->id,
+                    'judul' => 'Pembayaran Diterima',
+                    'pesan' => sprintf(
+                        'Pembayaran tagihan bulan %s telah diverifikasi. Terima kasih.',
+                        $pembayaran->tagihan->bulan_tagihan
+                    ),
+                    'tipe' => 'pembayaran',
+                ]);
+            } else {
+                Notification::create([
+                    'user_id' => $penerima->id,
+                    'judul' => 'Pembayaran Ditolak',
+                    'pesan' => sprintf(
+                        'Pembayaran tagihan bulan %s ditolak. Alasan: %s',
+                        $pembayaran->tagihan->bulan_tagihan,
+                        $validated['alasan_penolakan']
+                    ),
+                    'tipe' => 'pembayaran',
+                ]);
+            }
+        }
+
+        $pembayaran->load([
+            'tagihan.penghunian.user:id,name,email,no_hp,image',
+            'tagihan.penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => $validated['status_verifikasi'] === 'success'
+                ? 'Pembayaran berhasil diverifikasi.'
+                : 'Pembayaran berhasil ditolak.',
+            'data' => $pembayaran,
+        ]);
     }
 
     /**
-     * Display the specified resource.
+     * DELETE /admin/verifikasipembayaran/{pembayaran}
      */
-    public function show(string $id)
+    public function destroy(Pembayaran $pembayaran)
     {
-        //
-    }
+        if ($pembayaran->bukti_pembayaran) {
+            Storage::disk('public')->delete($pembayaran->bukti_pembayaran);
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        $pembayaran->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json([
+            'success' => true,
+            'message' => 'Pembayaran berhasil dihapus.',
+        ]);
     }
 }

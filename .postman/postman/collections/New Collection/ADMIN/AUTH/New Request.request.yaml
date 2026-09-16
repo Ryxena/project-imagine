@@ -1,0 +1,41 @@
+$kind: http-request
+name: Login
+url: '{{host}}/login'
+method: POST
+order: 1789557260714
+headers:
+  - key: Accept
+    value: application/json
+  - key: Content-Type
+    value: application/json
+  - key: X-XSRF-TOKEN
+    value: '{{xsrf_token}}'
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin@imagine.test",
+      "password": "password"
+    }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      const baseUrl = pm.variables.replaceIn('{{host}}').replace(/\/$/, '');
+
+      pm.sendRequest({
+        url: `${baseUrl}/sanctum/csrf-cookie`,
+        method: 'GET',
+        header: { Accept: 'application/json' }
+      }, (error) => {
+        if (error) {
+          throw error;
+        }
+
+        const xsrfCookie = pm.cookies.get('XSRF-TOKEN');
+        if (!xsrfCookie) {
+          throw new Error('CSRF endpoint did not set the XSRF-TOKEN cookie');
+        }
+
+        pm.variables.set('xsrf_token', decodeURIComponent(xsrfCookie));
+      });

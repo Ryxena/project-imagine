@@ -34,7 +34,41 @@ class UserFactory extends Factory
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user is a super admin.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'super_admin',
+            'status' => 'aktif',
+            'no_hp' => fake()->phoneNumber(),
+        ]);
+    }
+
+    /**
+     * Indicate that the user is an active penghuni.
+     */
+    public function penghuni(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'user',
+            'status' => 'aktif',
+            'no_hp' => fake()->phoneNumber(),
+        ]);
+    }
+
+    /**
+     * Indicate that the user account is inactive.
+     */
+    public function nonaktif(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'non-aktif',
+        ]);
+    }
+
+    /**
+     * Indicate that the email address should be unverified.
      */
     public function unverified(): static
     {
