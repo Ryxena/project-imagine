@@ -15,7 +15,7 @@ use Illuminate\Validation\Rule;
 
 class ManajemenPenghuniController extends Controller
 {
-        /**
+    /**
      * GET /api/penghunians
      *
      * Search:
@@ -47,14 +47,11 @@ class ManajemenPenghuniController extends Controller
                 'penghunians.tanggal_checkout',
                 'penghunians.created_at',
                 'penghunians.updated_at',
-            ])->when($search, function ($query, $search){
-                $query->where('users.name', 'like', "%{$search}%");})->latest('penghunians.created_at')->get();
+            ])->when($search, function ($query, $search) {
+                $query->where('users.name', 'like', "%{$search}%");
+            })->latest('penghunians.created_at')->get();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data penghuni berhasil diambil.',
-            'data' => $penghunians,
-        ]);
+        return view('admin.penghuni.ManajemenPenghuni', compact('penghunians'));
     }
 
     public function showKamar()
@@ -86,8 +83,8 @@ class ManajemenPenghuniController extends Controller
         }
 
         $validated = $request->validate([
-            'kamar_id' => ['required','exists:kamars,id',],
-            'tanggal_masuk' => ['required','date',],
+            'kamar_id' => ['required', 'exists:kamars,id',],
+            'tanggal_masuk' => ['required', 'date',],
         ]);
 
         $kamarSudahTerisi = Penghunian::query()
@@ -189,16 +186,16 @@ class ManajemenPenghuniController extends Controller
                     );
                 }
 
-            // Membuat USER
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'image' => $imagePath,
-                'no_hp' => $validated['no_hp'],
-                'status' => $validated['status'] ?? 'aktif',
-                'role' => 'user',
-            ]);
+                // Membuat USER
+                $user = User::create([
+                    'name' => $validated['name'],
+                    'email' => $validated['email'],
+                    'password' => Hash::make($validated['password']),
+                    'image' => $imagePath,
+                    'no_hp' => $validated['no_hp'],
+                    'status' => $validated['status'] ?? 'aktif',
+                    'role' => 'user',
+                ]);
 
                 // Membuat PENGHUNIAN
                 return Penghunian::create([
@@ -216,7 +213,6 @@ class ManajemenPenghuniController extends Controller
                 'message' => 'Data penghuni berhasil ditambahkan.',
                 'data' => $penghunian,
             ], 201);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -344,7 +340,6 @@ class ManajemenPenghuniController extends Controller
                 'message' => 'Data penghuni berhasil diperbarui.',
                 'data' => $penghunian,
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
@@ -381,7 +376,6 @@ class ManajemenPenghuniController extends Controller
                 'success' => true,
                 'message' => 'Data penghuni berhasil dihapus.',
             ]);
-
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,

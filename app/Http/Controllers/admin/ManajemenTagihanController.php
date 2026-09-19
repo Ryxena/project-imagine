@@ -20,34 +20,28 @@ class ManajemenTagihanController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $status = $request->query('status');
-
         $tagihans = Tagihan::query()
             ->with([
                 'pembayaran',
                 'penghunian.user:id,name,email,no_hp,image',
                 'penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
             ])
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($query) use ($search) {
-                    $query->where('bulan_tagihan', 'like', "%{$search}%")
-                        ->orWhereHas('penghunian.user', function ($query) use ($search) {
-                            $query->where('name', 'like', "%{$search}%");
-                        });
-                });
-            })
             ->latest()
-            ->get()
-            ->when($status, function ($tagihans) use ($status) {
-                return $tagihans->where('status_pembayaran', $status)->values();
-            });
+            ->get();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data tagihan berhasil diambil.',
-            'data' => $tagihans,
-        ]);
+        $bulanIni = now()->format('Y-m');
+        $tagihanBulanIni = $tagihans->where('penghunian.tanggal_masuk')->values(); // placeholder, filtered below
+        $tagihanBulanIni = $tagihans->filter(fn ($t) => $t->bulan_tagihan === $bulanIni)->values();
+
+        $kpi = [
+            'total_pendapatan' => $tagihans->where('status_pembayaran', 'lunas')->sum('jumlah'),
+            'belum_dibayar' => $tagihans->whereIn('status_pembayaran', ['belum_bayar', 'menunggu_verifikasi'])->sum('jumlah'),
+            'pending_count' => $tagihans->whereIn('status_pembayaran', ['belum_bayar', 'menunggu_verifikasi'])->count(),
+            'lunas_bulan_ini' => $tagihanBulanIni->where('status_pembayaran', 'lunas')->count(),
+            'total_bulan_ini' => $tagihanBulanIni->count(),
+        ];
+
+        return view('admin.tagihan.KelolaTagihan', compact('tagihans', 'kpi'));
     }
 
     /**

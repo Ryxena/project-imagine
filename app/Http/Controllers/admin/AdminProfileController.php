@@ -18,31 +18,7 @@ class AdminProfileController extends Controller
     {
         $user = $request->user();
 
-        $user->load([
-            'penghunian' => function ($query) {
-                $query->with([
-                    'kamar',
-                    // 'lastKamar',
-                ]);
-            },
-        ]);
-
-        return response()->json([
-            'message' => 'Profile berhasil diambil.',
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'no_hp' => $user->no_hp,
-                    'image' => $user->image,
-                    'role' => $user->role,
-                    'status' => $user->status,
-                ],
-
-                'penghunian' => $user->penghunian,
-            ],
-        ]);
+        return view('admin.Profile', compact('user'));
     }
 
     /**
@@ -79,7 +55,7 @@ class AdminProfileController extends Controller
                 ->store('user/profile', 'public');
         }
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);

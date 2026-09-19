@@ -13,53 +13,32 @@ class ManajemenKamarController extends Controller
      */
     public function index(Request $request)
     {
-        $sortHarga = $request->query('sort_harga');
-        $filterKamar = $request->query('filter_kamar');
-
         $kamar = Kamar::query()
-        ->leftJoin(
-            'penghunians',
-            'kamars.id','=','penghunians.kamar_id'
-        )->leftJoin(
-            'users',
-            'penghunians.user_id','=','users.id')->select([
-            'kamars.id',
-            'kamars.nomor_kamar',
-            'kamars.tipe_kamar',
-            'kamars.harga',
-            'kamars.deskripsi',
+            ->leftJoin(
+                'penghunians',
+                'kamars.id', '=', 'penghunians.kamar_id'
+            )->leftJoin(
+                'users',
+                'penghunians.user_id', '=', 'users.id')->select([
+                    'kamars.id',
+                    'kamars.nomor_kamar',
+                    'kamars.tipe_kamar',
+                    'kamars.harga',
+                    'kamars.deskripsi',
 
-            'users.name',
+                    'users.name',
 
-            'penghunians.tanggal_masuk',
-            'penghunians.tanggal_checkout',
-        ])
+                    'penghunians.kamar_id as penghuni_kamar_id',
+                    'penghunians.tanggal_masuk',
+                    'penghunians.tanggal_checkout',
+                ])
+            ->where(function ($q) {
+                $q->whereNull('penghunians.tanggal_checkout')
+                    ->orWhereNull('penghunians.kamar_id');
+            })
+            ->get();
 
-        // Filter kamar
-        ->when($filterKamar === 'terisi', function ($query) {
-            $query->whereNotNull('penghunians.kamar_id');
-        })
-
-        ->when($filterKamar === 'kosong', function ($query) {
-            $query->whereNull('penghunians.kamar_id');
-        })
-
-        // Sort harga
-        ->when($sortHarga === 'termurah', function ($query) {
-            $query->orderBy('kamars.harga', 'asc');
-        })
-
-        ->when($sortHarga === 'termahal', function ($query) {
-            $query->orderBy('kamars.harga', 'desc');
-        })
-
-        ->get();
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data kamar berhasil diambil.',
-            'data' => $kamar,
-        ]);
+        return view('admin.kamar.ManajemenKamar', compact('kamar'));
     }
 
     /**
@@ -136,6 +115,7 @@ class ManajemenKamarController extends Controller
     public function destroy(Kamar $kamar)
     {
         $kamar->delete();
+
         return response()->json([
             'success' => true,
             'message' => 'Data kamar berhasil dihapus.',
