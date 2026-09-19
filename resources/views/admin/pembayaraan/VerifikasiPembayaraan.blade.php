@@ -65,8 +65,20 @@
                 </div>
             </div>
         @empty
-            <div class="bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm">
-                <p class="text-sm text-cream-600">Tidak ada pembayaran yang menunggu verifikasi.</p>
+            <div class="px-5 py-10 text-center">
+
+                <div class="mx-auto w-10 h-10 rounded-full bg-sage-50 text-sage-600 flex items-center justify-center">
+                    @include('partial.icons.shield', ['class' => 'w-5 h-5'])
+                </div>
+
+                <p class="mt-3 text-sm font-medium text-cream-800">
+                    Tidak ada pembayaran menunggu verifikasi
+                </p>
+
+                <p class="mt-1 text-xs text-cream-600 max-w-xs mx-auto leading-relaxed">
+                    Semua pembayaran sudah diperiksa. Pengajuan baru akan muncul di sini.
+                </p>
+
             </div>
         @endforelse
     </div>

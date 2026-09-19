@@ -75,8 +75,15 @@
                             </svg>
                         </button>
                         @if ($k->status !== 'resolved')
+                            @php
+                                $actionClass = match ($k->status) {
+                                    'pending' => 'bg-terracotta-500 hover:bg-terracotta-600',
+                                    'process' => 'bg-sage-700 hover:bg-sage-800',
+                                };
+                            @endphp
+
                             <button onclick="advanceStatus({{ $k->id }})"
-                                class="text-xs font-medium text-white bg-sage-700 px-3 py-1.5 rounded-lg hover:bg-sage-800 transition-colors duration-150">
+                                class="text-xs font-medium text-white px-3 py-1.5 rounded-lg transition-colors duration-150 {{ $actionClass }}">
                                 {{ $k->status === 'pending' ? 'Proses' : 'Selesai' }}
                             </button>
                         @endif
@@ -150,8 +157,8 @@
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="closeDetailKeluhan()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Tutup</button>
-                <button id="dk-action-btn" onclick="advanceStatusFromDetail()"
-                    class="bg-sage-700 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-sage-800 active:scale-[0.98] transition-all duration-150 ease-out">
+                <button id="dk-action-btn"
+                    class="text-white text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-150 ease-out">
                     Tandai Selesai
                 </button>
             </div>
@@ -281,6 +288,25 @@
             if (meta.action) {
                 actionBtn.classList.remove('hidden');
                 actionBtn.textContent = meta.action;
+
+                actionBtn.classList.remove(
+                    'bg-sage-700',
+                    'hover:bg-sage-800',
+                    'bg-terracotta-500',
+                    'hover:bg-terracotta-600'
+                );
+
+                if (k.status === 'pending') {
+                    actionBtn.classList.add(
+                        'bg-terracotta-500',
+                        'hover:bg-terracotta-600'
+                    );
+                } else if (k.status === 'process') {
+                    actionBtn.classList.add(
+                        'bg-sage-700',
+                        'hover:bg-sage-800'
+                    );
+                }
             } else {
                 actionBtn.classList.add('hidden');
             }
