@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 // use Illuminate\Support\Facades\Hash;
@@ -30,11 +28,16 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return response()->json([
-            'message' => 'Login berhasil.',
-            'user' => Auth::user(),
-        ]);
+        $user = Auth::user();
+
+        if ($user->role === 'super_admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // TODO: ganti ke route('penghuni.dashboard') begitu controller & route-nya aktif.
+        return redirect()->route('penghuni.tagihan.index');
     }
+
     public function me()
     {
         return response()->json([
@@ -50,9 +53,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return response()->json([
-            'message' => 'Logout berhasil.',
-        ]);
+        return redirect()->route('login');
     }
 }
-

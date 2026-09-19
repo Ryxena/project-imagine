@@ -183,12 +183,12 @@
                 @csrf
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Nama Lengkap</label>
-                    <input type="text" name="name" required placeholder="Nama lengkap penghuni"
+                    <input type="text" name="name" required placeholder="Masukkan Nama lengkap penghuni"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Email</label>
-                    <input type="email" name="email" required placeholder="contoh@gmail.com"
+                    <input type="email" name="email" required placeholder="nama@gmail.com"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
                 <div>
@@ -199,7 +199,7 @@
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Password Sementara</label>
                     <input type="password" name="password" required minlength="8"
-                        placeholder="Password sementara untuk penghuni login"
+                        placeholder="Minimal 8 karakter"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
                 <p id="tambah-error" class="hidden text-xs text-terracotta-600"></p>
