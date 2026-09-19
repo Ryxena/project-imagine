@@ -1,9 +1,67 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'DM Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-cream-page: #f7f5f1;
+
+    /* Primary — sage */
+    --color-sage-50: #f5f6f4;
+    --color-sage-100: #ebede8;
+    --color-sage-200: #d6dbd2;
+    --color-sage-300: #bcc4b6;
+    --color-sage-400: #9ea994;
+    --color-sage-500: #7c8a6f;
+    --color-sage-600: #66715b;
+    --color-sage-700: #4f5847;
+    --color-sage-800: #3c4235;
+    --color-sage-900: #282c24;
+
+    /* Aksen — terracotta */
+    --color-terracotta-50: #fbf3ef;
+    --color-terracotta-100: #f7e7de;
+    --color-terracotta-200: #efd0bd;
+    --color-terracotta-300: #e5b294;
+    --color-terracotta-400: #d98f63;
+    --color-terracotta-500: #c1652f;
+    --color-terracotta-600: #9e5327;
+    --color-terracotta-700: #7c411e;
+
+    /* Netral — warm cream */
+    --color-cream-50: #fcfbfa;
+    --color-cream-100: #f7f5f3;
+    --color-cream-200: #edeae3;
+    --color-cream-300: #ded9ce;
+    --color-cream-600: #8d7d5e;
+    --color-cream-900: #312c21;
+
+    /* Semantik: warning */
+    --color-amber-100: #f9ebd2;
+    --color-amber-500: #e2a336;
+    --color-amber-600: #cd8d1d;
+
+    /* Semantik: info */
+    --color-slateblue-100: #e2e5e9;
+    --color-slateblue-500: #7b899d;
+    --color-slateblue-600: #5f6d81;    
+}
+
+@keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.bg-cream-page {
+    background-color: #eef3e9;
+    background-image: radial-gradient(circle at 15% 0%, #fbf9f5 0%, transparent 45%);
+}
+
+
+.animate-in {
+    animation: fade-in-up 0.4s ease-out both;
 }

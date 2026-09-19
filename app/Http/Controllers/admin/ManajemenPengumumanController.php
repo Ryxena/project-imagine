@@ -14,16 +14,13 @@ class ManajemenPengumumanController extends Controller
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'data' => $pengumuman,
-        ]);
+        return view('admin.pengumuman.ManajemenPengumuman', compact('pengumuman'));
     }
 
     public function store(Request $request)
     {
         $user = $request->user();
-        
+
         $validated = $request->validate([
             'judul' => 'required|string|max:255',
             'type' => 'required|in:informasi,umum,penting',

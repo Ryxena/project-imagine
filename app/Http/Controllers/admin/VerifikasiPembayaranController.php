@@ -21,30 +21,15 @@ class VerifikasiPembayaranController extends Controller
      */
     public function index(Request $request)
     {
-        $search = $request->query('search');
-        $status = $request->query('status');
-
         $pembayarans = Pembayaran::query()
             ->with([
                 'tagihan.penghunian.user:id,name,email,no_hp,image',
                 'tagihan.penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
             ])
-            ->when($status, function ($query, $status) {
-                $query->where('status_verifikasi', $status);
-            })
-            ->when($search, function ($query) use ($search) {
-                $query->whereHas('tagihan.penghunian.user', function ($query) use ($search) {
-                    $query->where('name', 'like', "%{$search}%");
-                });
-            })
             ->latest()
             ->get();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Data pembayaran berhasil diambil.',
-            'data' => $pembayarans,
-        ]);
+        return view('admin.pembayaraan.VerifikasiPembayaraan', compact('pembayarans'));
     }
 
     /**

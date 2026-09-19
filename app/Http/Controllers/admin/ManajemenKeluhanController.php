@@ -10,23 +10,15 @@ class ManajemenKeluhanController extends Controller
 {
     public function index(Request $request)
     {
-        $request->validate([
-            'status' => 'nullable|in:pending,process,resolved',
-        ]);
-
         $keluhans = Keluhan::with([
-            'user:id,name,image',
-            'user.penghunian:id,user_id,kamar_id,tanggal_masuk',
+            'user:id,name',
+            'user.penghunian' => function ($query) {
+                $query->select('id', 'user_id', 'kamar_id', 'tanggal_masuk')->latest();
+            },
             'user.penghunian.kamar:id,nomor_kamar',
-        ])->when($request->status, function ($query, $status) {
-            $query->where('status', $status);
-        })->latest()->get();
+        ])->latest()->get();
 
-        return response()->json([
-            'success' => true,
-            'filter' => $request->status ?? 'all',
-            'data' => $keluhans,
-        ]);
+        return view('admin.keluhan.ManajemenKeluhan', compact('keluhans'));
     }
 
     public function update(Request $request, Keluhan $keluhan)
