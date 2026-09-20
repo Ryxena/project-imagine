@@ -23,11 +23,23 @@
 @endphp
 
 <aside id="sidebar"
-    class="w-56 shrink-0 bg-sage-700 border-r border-sage-800 flex flex-col justify-between transition-[width] duration-300 ease-in-out relative z-40">
+    class="
+    fixed inset-y-0 left-0 z-50
+    w-56
+    -translate-x-full lg:translate-x-0
+
+    bg-sage-700 border-r border-sage-800
+    flex flex-col justify-between
+
+    transition-[transform] duration-300 ease-in-out
+
+    lg:static lg:shrink-0
+    lg:transition-[width] lg:duration-300
+    ">
     <div>
         <div class="px-5 py-6 flex items-center">
             <div class="w-8 h-8 rounded-lg bg-sage-500 border border-sage-400 flex items-center justify-center shrink-0 relative overflow-hidden cursor-pointer hover:bg-sage-600/50 transition-colors duration-200"
-                onclick="toggleSidebar()">
+                onclick="handleSidebarLogoClick()">
                 <span class="text-white font-extrabold text-[15px] z-10">logo</span>
                 <div class="absolute bottom-0 w-full h-1/3 bg-sage-600/50"></div>
             </div>
@@ -46,7 +58,7 @@
                 @endphp
 
                 <div class="relative px-3">
-                    <a href="{{ route($item['route']) }}"
+                    <a href="{{ route($item['route']) }}" onclick="closeMobileSidebar()"
                         class="group relative z-10 flex items-center px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ease-out
                         {{ $active ? 'bg-cream-page text-sage-900' : 'text-sage-100 hover:bg-sage-600 hover:text-white' }}">
 
@@ -167,37 +179,46 @@
             const sidebar = document.getElementById('sidebar');
             const texts = document.querySelectorAll('.sidebar-text');
 
-            const isCurrentlyExpanded = sidebar.classList.contains('w-56');
+            const isCollapsed = localStorage.getItem('sidebar_collapsed') === 'true';
 
-            if (isCurrentlyExpanded) {
+            if (!isCollapsed) {
                 sidebar.classList.remove('w-56');
                 sidebar.classList.add('w-[72px]');
 
                 texts.forEach(el => {
                     el.classList.remove('w-full', 'opacity-100', 'ml-3', 'ml-2.5');
                     el.classList.add('w-0', 'opacity-0');
+
                     if (el.id === 'user-menu-chevron') {
                         el.classList.add('hidden');
                     }
                 });
 
                 localStorage.setItem('sidebar_collapsed', 'true');
+
             } else {
                 sidebar.classList.remove('w-[72px]');
                 sidebar.classList.add('w-56');
 
                 texts.forEach(el => {
-                    el.classList.remove('w-0', 'opacity-0', 'hidden');
+                    el.classList.remove('w-0', 'opacity-0');
+
                     if (el.tagName.toLowerCase() === 'span') {
                         el.classList.add('w-full', 'opacity-100', 'ml-2.5');
                     } else if (el.id !== 'user-menu-chevron') {
                         el.classList.add('w-full', 'opacity-100', 'ml-3');
-                    } else {
-                        el.classList.add('opacity-100');
                     }
                 });
 
                 localStorage.setItem('sidebar_collapsed', 'false');
+            }
+        }
+
+        function handleSidebarLogoClick() {
+            if (window.innerWidth >= 1024) {
+                toggleSidebar();
+            } else {
+                toggleMobileSidebar();
             }
         }
 
