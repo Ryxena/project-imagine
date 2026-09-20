@@ -19,19 +19,21 @@ class ManajemenKamarController extends Controller
                 'kamars.id', '=', 'penghunians.kamar_id'
             )->leftJoin(
                 'users',
-                'penghunians.user_id', '=', 'users.id')->select([
-                    'kamars.id',
-                    'kamars.nomor_kamar',
-                    'kamars.tipe_kamar',
-                    'kamars.harga',
-                    'kamars.deskripsi',
+                'penghunians.user_id', '=', 'users.id'
+            )->select([
+                'kamars.id',
+                'kamars.nomor_kamar',
+                'kamars.tipe_kamar',
+                'kamars.harga',
+                'kamars.deskripsi',
 
-                    'users.name',
+                'users.name',
+                'users.image',
 
-                    'penghunians.kamar_id as penghuni_kamar_id',
-                    'penghunians.tanggal_masuk',
-                    'penghunians.tanggal_checkout',
-                ])
+                'penghunians.kamar_id as penghuni_kamar_id',
+                'penghunians.tanggal_masuk',
+                'penghunians.tanggal_checkout',
+            ])
             ->where(function ($q) {
                 $q->whereNull('penghunians.tanggal_checkout')
                     ->orWhereNull('penghunians.kamar_id');

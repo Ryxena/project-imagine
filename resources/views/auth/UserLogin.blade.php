@@ -13,7 +13,6 @@
 <body class="bg-cream-page font-sans antialiased text-cream-900">
 
     <div class="min-h-screen grid lg:grid-cols-2">
-
         <section class="hidden lg:flex relative overflow-hidden bg-sage-800">
             <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                 <div class="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-sage-500/20 blur-[100px]">
@@ -25,12 +24,17 @@
 
             <div class="relative z-10 flex flex-col justify-center gap-8 h-full px-16 py-16 w-full max-w-2xl mx-auto">
                 <div>
-                    <div
-                        class="w-12 h-12 rounded-xl bg-sage-600 border border-sage-400/50 flex items-center justify-center shadow-inner">
-                        <span class="text-white font-extrabold text-xl">logo</span>
+                    <div class="flex items-center gap-3">
+                        <div class="w-[32px] h-[32px] flex items-center justify-center shrink-0">
+                            <img src="{{ asset('images/logo.png') }}" alt="Logo NgekostYuk"
+                                class="w-full h-full object-contain">
+                        </div>
+                        <h1 class="text-[25px] font-bold leading-none tracking-tight flex items-baseline">
+                            <span class="text-white">Ngekost</span><span class="text-terracotta-400">Yuk</span>
+                        </h1>
                     </div>
 
-                    <h1 class="mt-10 text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+                    <h1 class="mt-5 text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
                         Kelola kost,<br>
                         <span class="text-sage-300">lebih tenang setiap hari.</span>
                     </h1>
@@ -42,9 +46,10 @@
 
                 <div>
                     <div class="space-y-4">
-                        {{-- Poin 1: Tagihan --}}
-                        <div class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
                                 <span class="w-5 h-5 text-white flex items-center justify-center">
                                     @include('partial.icons.receipt')
                                 </span>
@@ -53,10 +58,10 @@
                                 Tagihan dan pembayaran tercatat rapi
                             </span>
                         </div>
-
-                        {{-- Poin 2: Pengumuman --}}
-                        <div class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default ml-4 lg:ml-8">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default ml-4 lg:ml-8">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
                                 <span class="w-5 h-5 text-white flex items-center justify-center">
                                     @include('partial.icons.megaphone')
                                 </span>
@@ -65,10 +70,10 @@
                                 Kabar dan pengumuman langsung sampai
                             </span>
                         </div>
-
-                        {{-- Poin 3: Keluhan --}}
-                        <div class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default">
-                            <div class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
+                        <div
+                            class="group flex items-center gap-4 p-2 pr-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm shadow-xl w-max hover:bg-white/10 hover:-translate-y-1 transition-all duration-300 ease-out cursor-default">
+                            <div
+                                class="flex-shrink-0 w-10 h-10 rounded-[12px] bg-sage-500/80 border border-sage-500/50 flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform duration-300">
                                 <span class="w-5 h-5 text-white flex items-center justify-center">
                                     @include('partial.icons.warning')
                                 </span>
@@ -86,18 +91,19 @@
             </div>
         </section>
 
-        {{-- RIGHT: Form Area --}}
         <section class="flex items-center justify-center px-6 py-10 lg:py-16 relative">
 
             <div class="w-full max-w-sm animate-in fade-in slide-in-from-bottom-4 duration-700">
-
-                <div class="lg:hidden text-center mb-10">
-                    <div
-                        class="mx-auto w-12 h-12 rounded-xl bg-sage-700 border border-sage-600 flex items-center justify-center shadow-inner">
-                        <span class="text-white font-extrabold text-xl">N</span>
+                <div class="lg:hidden text-center mb-10 flex flex-col items-center">
+                    <div class="w-14 h-14 flex items-center justify-center shrink-0">
+                        <img src="{{ asset('images/logo.png') }}" alt="Logo NgekostYuk"
+                            class="w-full h-full object-contain">
                     </div>
-                    <h1 class="mt-4 text-2xl font-bold text-cream-900 tracking-tight">NgekostYuk</h1>
-                    <p class="mt-1 text-sm text-cream-600">Kelola Kost, Tanpa Ribet</p>
+                    <h1 class="mt-4 text-2xl font-bold leading-none tracking-tight flex items-baseline justify-center">
+                        <span class="text-sage-900">Ngekost</span><span class="text-terracotta-500">Yuk</span>
+                    </h1>
+                    <p class="mt-1.5 text-sm font-medium text-cream-600 tracking-wide uppercase">Kelola Kost, Tanpa
+                        Ribet</p>
                 </div>
 
                 <div>
@@ -126,13 +132,11 @@
                 <form action="{{ route('login.process') }}" method="POST" class="mt-6 space-y-4">
                     @csrf
 
-                    {{-- Field Email --}}
                     <div>
                         <label class="block mb-1 text-[11px] font-bold text-cream-800 uppercase tracking-wider">
                             Email
                         </label>
                         <div class="relative">
-                            {{-- Ikon Amplop / Mail (Kiri) --}}
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-cream-400" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor" stroke-width="2">
@@ -141,7 +145,6 @@
                                 </svg>
                             </div>
 
-                            {{-- Perhatikan perubahan pl-9 (padding-left: 36px) agar teks tidak nabrak ikon --}}
                             <input type="email" name="email" value="{{ old('email') }}" required autofocus
                                 placeholder="nama@email.com"
                                 class="w-full rounded-lg border border-cream-300 bg-white pl-9 pr-3.5 py-2 text-[13px] shadow-sm transition-all duration-200
@@ -150,13 +153,11 @@
                         </div>
                     </div>
 
-                    {{-- Field Password --}}
                     <div>
                         <label class="block mb-1 text-[11px] font-bold text-cream-800 uppercase tracking-wider">
                             Password
                         </label>
                         <div class="relative">
-                            {{-- Ikon Gembok / Lock (Kiri) --}}
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="w-4 h-4 text-cream-400" fill="none" viewBox="0 0 24 24"
                                     stroke="currentColor" stroke-width="2">
@@ -165,7 +166,6 @@
                                 </svg>
                             </div>
 
-                            {{-- Perhatikan penambahan pl-9 (padding-left) dan pr-9 (padding-right) --}}
                             <input id="password" type="password" name="password" required placeholder="••••••••"
                                 class="w-full rounded-lg border border-cream-300 bg-white pl-9 pr-9 py-2 text-[13px] shadow-sm transition-all duration-200
                                 placeholder:text-cream-400

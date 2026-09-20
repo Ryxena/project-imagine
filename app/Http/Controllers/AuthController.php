@@ -34,8 +34,7 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        // TODO: ganti ke route('penghuni.dashboard') begitu controller & route-nya aktif.
-        return redirect()->route('penghuni.tagihan.index');
+        return redirect()->route('penghuni.dashboard');
     }
 
     public function me()

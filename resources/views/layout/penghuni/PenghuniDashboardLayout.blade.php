@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'NgekostYuk') | Admin</title>
+    <title>@yield('title', 'NgekostYuk') | Penghuni</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -37,7 +37,9 @@
                         </svg>
                     </button>
 
-                    <p class="text-sm font-bold text-cream-900">NgekostYuk</p>
+                    <p class="text-sm font-bold text-cream-900">
+                        NgekostYuk
+                    </p>
 
                     <div class="relative">
                         <button onclick="toggleNotifPanel('mobile')" id="notif-btn-mobile"
@@ -91,6 +93,7 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
             const isClosed = sidebar.classList.contains('-translate-x-full');
+
             sidebar.classList.toggle('-translate-x-full');
             overlay.classList.toggle('hidden');
             document.body.style.overflow = isClosed ? 'hidden' : '';
@@ -99,10 +102,12 @@
         function closeMobileSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebar-overlay');
+
             sidebar.classList.add('-translate-x-full');
             overlay.classList.add('hidden');
             document.body.style.overflow = '';
         }
+
 
         const svgReceipt =
             `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>`;
@@ -114,13 +119,13 @@
         const notifTypeMeta = {
             tagihan: {
                 rawSvg: svgReceipt,
-                tint: 'bg-sage-100 text-sage-700',
-                route: "{{ route('admin.tagihan.index') }}"
+                tint: 'bg-terracotta-100 text-terracotta-600',
+                route: "{{ route('penghuni.tagihan.index') }}"
             },
             pembayaran: {
                 rawSvg: svgShield,
-                tint: 'bg-amber-100 text-amber-600',
-                route: "{{ route('admin.verifikasipembayaran.index') }}"
+                tint: 'bg-sage-100 text-sage-700',
+                route: "{{ route('penghuni.tagihan.index') }}"
             },
         };
         const notifFallback = {
@@ -133,14 +138,13 @@
 
         async function fetchNotifCount() {
             try {
-                const res = await fetch("{{ route('admin.notifikasi.index') }}", {
+                const res = await fetch("{{ route('penghuni.notifikasi.index') }}", {
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
 
                 const json = await res.json();
-
                 const count = json.unread_count || 0;
                 const displayCount = count > 99 ? '99+' : count;
 
@@ -154,11 +158,9 @@
 
                 if (json.data && json.data.length > 0) {
                     const latestNotif = json.data[0];
-
                     if (lastNotifId !== null && latestNotif.id > lastNotifId && !latestNotif.dibaca) {
                         showToastNotif(latestNotif);
                     }
-
                     lastNotifId = latestNotif.id > (lastNotifId || 0) ? latestNotif.id : lastNotifId;
                 }
 
@@ -225,17 +227,17 @@
                 panel.classList.remove('hidden');
                 setTimeout(() => panel.setAttribute('data-open', 'true'), 10);
                 panel.innerHTML = `
-            <div class="flex items-center justify-between px-4 py-3 border-b border-cream-200 shrink-0">
-                <p class="text-sm font-semibold text-cream-900">Notifikasi</p>
-            </div>
-            <div class="p-8 text-center text-xs text-cream-500 flex flex-col items-center justify-center gap-2">
-                <div class="w-5 h-5 border-2 border-sage-600 border-t-transparent rounded-full animate-spin"></div>
-                <span>Memuat notifikasi...</span>
-            </div>
-        `;
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-cream-200 shrink-0">
+                        <p class="text-sm font-semibold text-cream-900">Notifikasi</p>
+                    </div>
+                    <div class="p-8 text-center text-xs text-cream-500 flex flex-col items-center justify-center gap-2">
+                        <div class="w-5 h-5 border-2 border-sage-600 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Memuat notifikasi...</span>
+                    </div>
+                `;
 
                 try {
-                    const res = await fetch('{{ route('admin.notifikasi.index') }}', {
+                    const res = await fetch('{{ route('penghuni.notifikasi.index') }}', {
                         headers: {
                             'Accept': 'application/json'
                         }
@@ -247,11 +249,11 @@
                 } catch (err) {
                     if (panel.getAttribute('data-open') === 'true') {
                         panel.innerHTML = `
-                    <div class="flex items-center justify-between px-4 py-3 border-b border-cream-200 shrink-0">
-                        <p class="text-sm font-semibold text-cream-900">Notifikasi</p>
-                    </div>
-                    <div class="p-8 text-center text-xs text-terracotta-600">Gagal memuat notifikasi.</div>
-                `;
+                            <div class="flex items-center justify-between px-4 py-3 border-b border-cream-200 shrink-0">
+                                <p class="text-sm font-semibold text-cream-900">Notifikasi</p>
+                            </div>
+                            <div class="p-8 text-center text-xs text-terracotta-600">Gagal memuat notifikasi.</div>
+                        `;
                     }
                 }
             } else {
@@ -297,7 +299,7 @@
 
         async function handleNotifClick(id, redirectUrl) {
             try {
-                await fetch(`/admin/notifikasi/${id}`, {
+                await fetch(`/penghuni/notifikasi/${id}`, {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
@@ -318,15 +320,16 @@
 
         async function markAllRead() {
             try {
-                await fetch('{{ route('admin.notifikasi.markallread') }}', {
+                await fetch("{{ route('penghuni.notifikasi.markallread') }}", {
                     method: 'PUT',
                     headers: {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     },
                 });
+
                 document.querySelectorAll('[id^="notif-panel-"]:not(.hidden)').forEach(async (panel) => {
-                    const res = await fetch('{{ route('admin.notifikasi.index') }}', {
+                    const res = await fetch("{{ route('penghuni.notifikasi.index') }}", {
                         headers: {
                             'Accept': 'application/json'
                         }
@@ -334,6 +337,7 @@
                     const json = await res.json();
                     renderNotifPanel(panel, json.data);
                 });
+
                 fetchNotifCount();
             } catch (err) {
                 console.error('Gagal menandai semua notifikasi:', err);

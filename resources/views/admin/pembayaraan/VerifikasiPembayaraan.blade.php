@@ -116,21 +116,10 @@
             </div>
         @endforelse
 
-        @if ($riwayat->count() > 5)
-            <div id="riwayat-pagination" class="flex items-center justify-between pt-2">
-                <p id="riwayat-page-info" class="text-xs text-cream-600"></p>
-                <div class="flex gap-2">
-                    <button onclick="changePage(-1)" id="btn-prev"
-                        class="text-xs font-medium text-cream-700 border border-cream-300 rounded-full px-3.5 py-1.5 hover:bg-cream-100 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed">
-                        Sebelumnya
-                    </button>
-                    <button onclick="changePage(1)" id="btn-next"
-                        class="text-xs font-medium text-cream-700 border border-cream-300 rounded-full px-3.5 py-1.5 hover:bg-cream-100 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed">
-                        Berikutnya
-                    </button>
-                </div>
+        <nav id="riwayat-pagination" role="navigation" class="hidden flex items-center justify-center pt-4 px-1">
+            <div id="riwayat-pagination-container" class="flex items-center gap-1.5">
             </div>
-        @endif
+        </nav>
     </div>
 
     <div id="modal-detail" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -276,23 +265,86 @@
 
         function renderPagination() {
             const items = document.querySelectorAll('.riwayat-item');
-            const totalPages = Math.ceil(items.length / PAGE_SIZE);
+            const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
 
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            // Atur visibilitas data item
             items.forEach((item, i) => {
                 const page = Math.floor(i / PAGE_SIZE) + 1;
                 item.style.display = (page === currentPage) ? '' : 'none';
             });
 
-            const infoEl = document.getElementById('riwayat-page-info');
-            const prevBtn = document.getElementById('btn-prev');
-            const nextBtn = document.getElementById('btn-next');
-            if (infoEl) infoEl.textContent = `Halaman ${currentPage} dari ${totalPages}`;
-            if (prevBtn) prevBtn.disabled = currentPage <= 1;
-            if (nextBtn) nextBtn.disabled = currentPage >= totalPages;
+            const paginationNav = document.getElementById('riwayat-pagination');
+            const container = document.getElementById('riwayat-pagination-container');
+
+            if (totalPages <= 1) {
+                paginationNav.classList.add('hidden');
+                return;
+            } else {
+                paginationNav.classList.remove('hidden');
+            }
+
+            let html = '';
+
+            // Tombol Previous
+            const prevDisabled = currentPage === 1;
+            html += `
+                <button onclick="changePage(-1)" ${prevDisabled ? 'disabled' : ''}
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150 ${
+                        prevDisabled 
+                            ? 'text-cream-300 bg-cream-50/60 border border-cream-200/60 cursor-not-allowed shadow-none' 
+                            : 'text-cream-700 bg-white border border-cream-200 hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 shadow-2xs cursor-pointer'
+                    }">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+            `;
+
+            // Tombol Nomor Halaman
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `
+                        <span class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-sage-700 border border-sage-700 rounded-xl shadow-xs cursor-default">
+                            ${i}
+                        </span>
+                    `;
+                } else {
+                    html += `
+                        <button onclick="goToPage(${i})"
+                            class="inline-flex items-center justify-center w-8 h-8 text-xs font-semibold text-cream-700 bg-white border border-cream-200 rounded-xl hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 transition-all duration-150 shadow-2xs">
+                            ${i}
+                        </button>
+                    `;
+                }
+            }
+
+            // Tombol Next
+            const nextDisabled = currentPage === totalPages;
+            html += `
+                <button onclick="changePage(1)" ${nextDisabled ? 'disabled' : ''}
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150 ${
+                        nextDisabled 
+                            ? 'text-cream-300 bg-cream-50/60 border border-cream-200/60 cursor-not-allowed shadow-none' 
+                            : 'text-cream-700 bg-white border border-cream-200 hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 shadow-2xs cursor-pointer'
+                    }">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </button>
+            `;
+
+            container.innerHTML = html;
         }
 
         function changePage(delta) {
             currentPage += delta;
+            renderPagination();
+        }
+
+        function goToPage(page) {
+            currentPage = page;
             renderPagination();
         }
 

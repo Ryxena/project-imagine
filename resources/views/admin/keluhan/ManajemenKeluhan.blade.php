@@ -34,6 +34,7 @@
         @forelse ($keluhans as $k)
             @php
                 $nama = $k->user->name ?? '-';
+                $image = $k->user->image ?? null;
                 $kamar = $k->user->penghunian->first()?->kamar?->nomor_kamar ?? '-';
                 [$badgeClass, $badgeLabel] = match ($k->status) {
                     'pending' => ['bg-terracotta-100 text-terracotta-600', 'Baru'],
@@ -41,25 +42,32 @@
                     default => ['bg-sage-100 text-sage-700', 'Selesai'],
                 };
             @endphp
-            <div class="keluhan-card bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out"
+            <div class="keluhan-card bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col justify-between"
                 data-status="{{ $k->status }}">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2.5 min-w-0">
-                        <div
-                            class="w-8 h-8 rounded-full bg-sage-200 text-sage-800 text-xs font-semibold flex items-center justify-center shrink-0">
-                            {{ strtoupper(substr($nama, 0, 1)) }}
+                <div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                            @if ($image)
+                                <img src="{{ asset('storage/' . $image) }}" alt="Foto {{ $nama }}"
+                                    class="w-8 h-8 rounded-full object-cover border border-sage-200 shrink-0 shadow-sm">
+                            @else
+                                <div
+                                    class="w-8 h-8 rounded-full bg-sage-200 text-sage-800 text-xs font-semibold flex items-center justify-center shrink-0">
+                                    {{ strtoupper(substr($nama, 0, 1)) }}
+                                </div>
+                            @endif
+                            <div class="min-w-0">
+                                <p class="text-sm font-semibold text-cream-900 truncate">{{ $nama }}</p>
+                                <p class="text-[11px] text-cream-600">Kamar {{ $kamar }}</p>
+                            </div>
                         </div>
-                        <div class="min-w-0">
-                            <p class="text-sm font-semibold text-cream-900 truncate">{{ $nama }}</p>
-                            <p class="text-[11px] text-cream-600">Kamar {{ $kamar }}</p>
-                        </div>
+                        <span
+                            class="shrink-0 {{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
                     </div>
-                    <span
-                        class="shrink-0 {{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
-                </div>
 
-                <p class="mt-3 text-sm font-semibold text-cream-900">{{ $k->judul }}</p>
-                <p class="mt-1 text-xs text-cream-600 line-clamp-2">{{ $k->deskripsi }}</p>
+                    <p class="mt-3 text-sm font-semibold text-cream-900">{{ $k->judul }}</p>
+                    <p class="mt-1 text-xs text-cream-600 line-clamp-2">{{ $k->deskripsi }}</p>
+                </div>
 
                 <div class="mt-3 pt-3 border-t border-cream-100 flex items-center justify-between">
                     <p class="text-[11px] text-cream-500">{{ $k->created_at->translatedFormat('d M Y') }}</p>
@@ -103,24 +111,16 @@
     </div>
 
     <div id="keluhan-empty-filter"
-        class="hidden col-span-full bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm">
+        class="hidden col-span-full bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm mt-5">
         <p id="keluhan-empty-title" class="text-sm font-medium text-cream-800"></p>
         <p id="keluhan-empty-desc" class="mt-1 text-xs text-cream-500"></p>
     </div>
 
-    <div id="keluhan-pagination" class="hidden flex items-center justify-between pt-4">
-        <p id="keluhan-page-info" class="text-xs text-cream-600"></p>
-        <div class="flex gap-2">
-            <button onclick="changeKeluhanPage(-1)" id="keluhan-btn-prev"
-                class="text-xs font-medium text-cream-700 border border-cream-300 rounded-full px-3.5 py-1.5 hover:bg-cream-100 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed">
-                Sebelumnya
-            </button>
-            <button onclick="changeKeluhanPage(1)" id="keluhan-btn-next"
-                class="text-xs font-medium text-cream-700 border border-cream-300 rounded-full px-3.5 py-1.5 hover:bg-cream-100 transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed">
-                Berikutnya
-            </button>
+    <nav id="keluhan-pagination" role="navigation" class="hidden flex items-center justify-center pt-6 px-1">
+        <div id="keluhan-pagination-container" class="flex items-center gap-1.5">
+
         </div>
-    </div>
+    </nav>
 
     <div id="modal-detail-keluhan" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeDetailKeluhan()"></div>
@@ -139,7 +139,7 @@
             <div class="px-6 py-5">
                 <div class="flex items-center gap-3">
                     <div id="dk-avatar"
-                        class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
+                        class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0 overflow-hidden">
                     </div>
                     <div>
                         <p id="dk-nama" class="text-sm font-semibold text-cream-900"></p>
@@ -157,7 +157,7 @@
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="closeDetailKeluhan()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Tutup</button>
-                <button id="dk-action-btn"
+                <button id="dk-action-btn" onclick="advanceStatusFromDetail()"
                     class="text-white text-sm font-medium px-5 py-2.5 rounded-full transition-all duration-150 ease-out">
                     Tandai Selesai
                 </button>
@@ -168,7 +168,7 @@
 
 @push('scripts')
     <script>
-        const keluhanData = @json($keluhans->keyBy('id'));
+        const keluhanData = @json($keluhans->load('user')->keyBy('id'));
         let currentKeluhanId = null;
         let activeFilter = 'semua';
         let keluhanPage = 1;
@@ -182,7 +182,7 @@
                 const active = t.dataset.filter === status;
                 t.classList.toggle('bg-sage-700', active);
                 t.classList.toggle('text-white', active);
-                t.classList.toggle('bg-cream-100', !active);
+                t.classList.toggle('bg-cream-200', !active);
                 t.classList.toggle('text-cream-600', !active);
             });
 
@@ -214,7 +214,6 @@
 
             if (visible.length === 0 && activeFilter !== 'semua') {
                 emptyState.classList.remove('hidden');
-
                 emptyTitle.textContent = filterMessages[activeFilter].title;
                 emptyDesc.textContent = filterMessages[activeFilter].desc;
             } else {
@@ -231,19 +230,76 @@
                 if (page === keluhanPage) card.style.display = '';
             });
 
-            const pag = document.getElementById('keluhan-pagination');
-            if (visible.length > KELUHAN_PAGE_SIZE) {
-                pag.classList.remove('hidden');
-                document.getElementById('keluhan-page-info').textContent = `Halaman ${keluhanPage} dari ${totalPages}`;
-                document.getElementById('keluhan-btn-prev').disabled = keluhanPage <= 1;
-                document.getElementById('keluhan-btn-next').disabled = keluhanPage >= totalPages;
+            const paginationNav = document.getElementById('keluhan-pagination');
+            const container = document.getElementById('keluhan-pagination-container');
+
+            if (visible.length <= KELUHAN_PAGE_SIZE) {
+                paginationNav.classList.add('hidden');
+                return;
             } else {
-                pag.classList.add('hidden');
+                paginationNav.classList.remove('hidden');
             }
+
+            let html = '';
+
+            // Tombol Previous
+            const prevDisabled = keluhanPage === 1;
+            html += `
+                <button onclick="changeKeluhanPage(-1)" ${prevDisabled ? 'disabled' : ''}
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150 ${
+                        prevDisabled 
+                            ? 'text-cream-300 bg-cream-50/60 border border-cream-200/60 cursor-not-allowed shadow-none' 
+                            : 'text-cream-700 bg-white border border-cream-200 hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 shadow-2xs cursor-pointer'
+                    }">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+            `;
+
+            // Tombol Nomor Halaman
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === keluhanPage) {
+                    html += `
+                        <span class="inline-flex items-center justify-center w-8 h-8 text-xs font-bold text-white bg-sage-700 border border-sage-700 rounded-xl shadow-xs cursor-default">
+                            ${i}
+                        </span>
+                    `;
+                } else {
+                    html += `
+                        <button onclick="goToKeluhanPage(${i})"
+                            class="inline-flex items-center justify-center w-8 h-8 text-xs font-semibold text-cream-700 bg-white border border-cream-200 rounded-xl hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 transition-all duration-150 shadow-2xs">
+                            ${i}
+                        </button>
+                    `;
+                }
+            }
+
+            // Tombol Next
+            const nextDisabled = keluhanPage === totalPages;
+            html += `
+                <button onclick="changeKeluhanPage(1)" ${nextDisabled ? 'disabled' : ''}
+                    class="inline-flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-150 ${
+                        nextDisabled 
+                            ? 'text-cream-300 bg-cream-50/60 border border-cream-200/60 cursor-not-allowed shadow-none' 
+                            : 'text-cream-700 bg-white border border-cream-200 hover:bg-sage-50 hover:border-sage-300 hover:text-sage-700 shadow-2xs cursor-pointer'
+                    }">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                </button>
+            `;
+
+            container.innerHTML = html;
         }
 
         function changeKeluhanPage(delta) {
             keluhanPage += delta;
+            renderKeluhanPage();
+        }
+
+        function goToKeluhanPage(page) {
+            keluhanPage = page;
             renderKeluhanPage();
         }
 
@@ -271,10 +327,23 @@
             currentKeluhanId = id;
             const k = keluhanData[id];
             const nama = k.user?.name ?? '-';
+            const image = k.user?.image ?? null;
             const kamar = k.user?.penghunian?.[0]?.kamar?.nomor_kamar ?? '-';
             const meta = statusMeta[k.status];
 
-            document.getElementById('dk-avatar').textContent = nama.charAt(0).toUpperCase();
+            const avatarContainer = document.getElementById('dk-avatar');
+
+            if (image && image.trim() !== '') {
+                avatarContainer.innerHTML =
+                    `<img src="/storage/${image}" alt="Foto ${nama}" class="w-full h-full rounded-full object-cover">`;
+                avatarContainer.className =
+                    "w-10 h-10 rounded-full overflow-hidden border border-sage-200 shrink-0 shadow-sm flex items-center justify-center";
+            } else {
+                avatarContainer.textContent = nama.charAt(0).toUpperCase();
+                avatarContainer.className =
+                    "w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0";
+            }
+
             document.getElementById('dk-nama').textContent = nama;
             document.getElementById('dk-kamar').textContent = `Kamar ${kamar}`;
             document.getElementById('dk-judul').textContent = k.judul;
