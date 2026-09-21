@@ -95,6 +95,11 @@
 
             <form id="form-password" class="mt-5 space-y-4">
                 <div>
+                    <label class="block text-xs font-medium text-cream-700 mb-1.5">Password Lama</label>
+                    <input type="password" id="current-password" placeholder="Masukkan password saat ini"
+                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
+                </div>
+                <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Password Baru</label>
                     <input type="password" id="new-password" placeholder="Masukkan password baru"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
@@ -105,12 +110,33 @@
                     <input type="password" id="confirm-password" placeholder="Ulangi password baru"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
-                <p id="password-error" class="hidden text-xs text-terracotta-600"></p>
-                <p id="password-success" class="hidden text-xs text-sage-700"></p>
-                <button type="button" onclick="submitPassword()"
-                    class="w-full text-sage-700 border border-sage-300 text-sm font-medium px-5 py-2.5 rounded-full hover:bg-sage-50 active:scale-[0.98] transition-all duration-150 ease-out">
-                    Ganti Password
-                </button>
+                <div id="password-error"
+                    class="hidden flex items-start gap-2.5 p-3.5 bg-terracotta-50 border border-terracotta-200 rounded-xl animate-in slide-in-from-top-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-4 h-4 text-terracotta-600 shrink-0 mt-0.5">
+                        <path fill-rule="evenodd"
+                            d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003zM12 8.25a.75.75 0 01.75.75v3.75a.75.75 0 01-1.5 0V9a.75.75 0 01.75-.75zm0 8.25a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p id="password-error-text" class="text-xs font-semibold text-terracotta-800 leading-relaxed"></p>
+                </div>
+                <div id="password-success"
+                    class="hidden flex items-start gap-2.5 p-3.5 bg-sage-50 border border-sage-200 rounded-xl animate-in slide-in-from-top-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"
+                        class="w-4 h-4 text-sage-600 shrink-0 mt-0.5">
+                        <path fill-rule="evenodd"
+                            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    <p id="password-success-text" class="text-xs font-semibold text-sage-800 leading-relaxed"></p>
+                </div>
+
+                <div class="pt-2">
+                    <button type="button" id="btn-submit-password" onclick="submitPassword()"
+                        class="w-full flex items-center justify-center gap-2 bg-white text-sage-700 border border-sage-300 text-sm font-medium px-5 py-2.5 rounded-full hover:bg-sage-50 active:scale-[0.98] transition-all duration-150 ease-out">
+                        Ganti Password
+                    </button>
+                </div>
             </form>
         </div>
     </div>
@@ -184,27 +210,49 @@
         }
 
         async function submitPassword() {
-            const errorEl = document.getElementById('password-error');
-            const successEl = document.getElementById('password-success');
-            errorEl.classList.add('hidden');
-            successEl.classList.add('hidden');
+            const errorContainer = document.getElementById('password-error');
+            const errorText = document.getElementById('password-error-text');
+            const successContainer = document.getElementById('password-success');
+            const successText = document.getElementById('password-success-text');
 
+            const submitBtn = document.getElementById('btn-submit-password');
+            const originalBtnHtml = submitBtn.innerHTML;
+
+            errorContainer.classList.add('hidden');
+            successContainer.classList.add('hidden');
+
+            const currentPassword = document.getElementById('current-password').value;
             const password = document.getElementById('new-password').value;
             const confirm = document.getElementById('confirm-password').value;
 
+            if (!currentPassword) {
+                errorText.textContent = 'Password lama wajib diisi untuk keamanan.';
+                errorContainer.classList.remove('hidden');
+                return;
+            }
             if (!password || password.length < 8) {
-                errorEl.textContent = 'Password baru minimal 8 karakter.';
-                errorEl.classList.remove('hidden');
+                errorText.textContent = 'Password baru minimal 8 karakter.';
+                errorContainer.classList.remove('hidden');
                 return;
             }
             if (password !== confirm) {
-                errorEl.textContent = 'Konfirmasi password tidak cocok.';
-                errorEl.classList.remove('hidden');
+                errorText.textContent = 'Konfirmasi password tidak cocok dengan password baru.';
+                errorContainer.classList.remove('hidden');
                 return;
             }
 
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            submitBtn.innerHTML = `
+                <svg class="animate-spin h-4 w-4 text-sage-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Memproses...
+            `;
+
             try {
-                const res = await fetch('{{ route('penghuni.profile.update') }}', {
+                const res = await fetch("{{ route('penghuni.profile.update') }}", {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -212,24 +260,35 @@
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                     },
                     body: JSON.stringify({
+                        current_password: currentPassword,
                         password: password,
                         password_confirmation: confirm,
                     }),
                 });
+
                 const json = await res.json();
 
                 if (!res.ok) {
-                    errorEl.textContent = json.message || 'Gagal mengganti password.';
-                    errorEl.classList.remove('hidden');
-                    return;
-                }
+                    let errorMsg = json.message || 'Gagal mengganti password. Silakan coba lagi.';
+                    if (json.errors) {
+                        if (json.errors.current_password) errorMsg = 'Password lama yang Anda masukkan salah.';
+                        else if (json.errors.password) errorMsg = json.errors.password[0];
+                    }
 
-                successEl.textContent = 'Password berhasil diganti.';
-                successEl.classList.remove('hidden');
-                document.getElementById('form-password').reset();
+                    errorText.textContent = errorMsg;
+                    errorContainer.classList.remove('hidden');
+                } else {
+                    successText.textContent = 'Password berhasil diganti! Pastikan Anda mengingatnya.';
+                    successContainer.classList.remove('hidden');
+                    document.getElementById('form-password').reset();
+                }
             } catch (err) {
-                errorEl.textContent = 'Terjadi kesalahan jaringan.';
-                errorEl.classList.remove('hidden');
+                errorText.textContent = 'Gagal terhubung ke server. Periksa koneksi internet Anda.';
+                errorContainer.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                submitBtn.innerHTML = originalBtnHtml;
             }
         }
     </script>

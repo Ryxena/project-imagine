@@ -21,6 +21,8 @@ class VerifikasiPembayaranController extends Controller
      */
     public function index(Request $request)
     {
+        $request->user()->update(['last_read_verifikasi' => now()]);
+
         $pembayarans = Pembayaran::query()
             ->with([
                 'tagihan.penghunian.user:id,name,email,no_hp,image',

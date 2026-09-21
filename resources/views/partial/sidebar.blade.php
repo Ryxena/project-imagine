@@ -27,12 +27,9 @@
     fixed inset-y-0 left-0 z-50
     w-56
     -translate-x-full lg:translate-x-0
-
     bg-sage-700 border-r border-sage-800
     flex flex-col justify-between
-
     transition-[transform] duration-300 ease-in-out
-
     lg:static lg:shrink-0
     lg:transition-[width] lg:duration-300
     ">
@@ -55,22 +52,70 @@
             @foreach ($menu as $item)
                 @php
                     $active = request()->routeIs($item['route'] . '*');
+                    $badgeCount = 0;
+                    $user = auth()->user();
+
+                    if ($isAdmin) {
+                        if ($item['route'] === 'admin.verifikasipembayaran.index') {
+                            $lastRead = $user->last_read_verifikasi ?? now()->subYears(5);
+
+                            $badgeCount = \App\Models\Pembayaran::where('status_verifikasi', 'pending')
+                                ->where('created_at', '>', $lastRead)
+                                ->count();
+                        } elseif ($item['route'] === 'admin.keluhan.index') {
+                            $lastRead = $user->last_read_keluhan_admin ?? now()->subYears(5);
+
+                            $badgeCount = \App\Models\Keluhan::where('created_at', '>', $lastRead)->count();
+                        }
+                    } else {
+                        if ($item['route'] === 'penghuni.tagihan.index') {
+                            $lastRead = $user->last_read_tagihan_penghuni ?? now()->subYears(5);
+
+                            $badgeCount = \App\Models\Tagihan::whereHas(
+                                'penghunian',
+                                fn($q) => $q->where('user_id', $user->id),
+                            )
+                                ->where('status_pembayaran', '!=', 'lunas')
+                                ->where('created_at', '>', $lastRead)
+                                ->count();
+                        } elseif ($item['route'] === 'penghuni.keluhan.index') {
+                            $lastRead = $user->last_read_keluhan_penghuni ?? now()->subYears(5);
+
+                            $badgeCount = \App\Models\Keluhan::where('user_id', $user->id)
+                                ->where('status', '!=', 'resolved')
+                                ->where('updated_at', '>', $lastRead)
+                                ->count();
+                        } elseif ($item['route'] === 'penghuni.pengumuman.index') {
+                            $lastRead = $user->last_read_pengumuman_penghuni ?? now()->subYears(5);
+
+                            $badgeCount = \App\Models\Pengumuman::where('created_at', '>', $lastRead)->count();
+                        }
+                    }
                 @endphp
 
                 <div class="relative px-3">
                     <a href="{{ route($item['route']) }}" onclick="closeMobileSidebar()"
-                        class="group relative z-10 flex items-center px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ease-out
+                        class="group relative z-10 flex items-center justify-between px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ease-out
                         {{ $active ? 'bg-cream-page text-sage-900' : 'text-sage-100 hover:bg-sage-600 hover:text-white' }}">
 
-                        <span
-                            class="w-5 flex justify-center shrink-0 transition-colors duration-200 {{ $active ? 'text-sage-700' : 'text-sage-300 group-hover:text-white' }}">
-                            @include('partial.icons.' . $item['icon'], ['class' => 'w-8 h-8'])
-                        </span>
+                        <div class="flex items-center min-w-0">
+                            <span
+                                class="w-5 flex justify-center shrink-0 transition-colors duration-200 {{ $active ? 'text-sage-700' : 'text-sage-300 group-hover:text-white' }}">
+                                @include('partial.icons.' . $item['icon'], ['class' => 'w-8 h-8'])
+                            </span>
 
-                        <span
-                            class="sidebar-text ml-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 opacity-100 w-full">
-                            {{ $item['label'] }}
-                        </span>
+                            <span
+                                class="sidebar-text ml-2.5 overflow-hidden whitespace-nowrap transition-all duration-300 opacity-100 truncate">
+                                {{ $item['label'] }}
+                            </span>
+                        </div>
+
+                        @if ($badgeCount > 0)
+                            <span
+                                class="sidebar-text shrink-0 bg-terracotta-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+                                {{ $badgeCount }}
+                            </span>
+                        @endif
                     </a>
                 </div>
             @endforeach

@@ -116,6 +116,13 @@ class ManajemenKamarController extends Controller
      */
     public function destroy(Kamar $kamar)
     {
+        if ($kamar->penghunian()->whereNull('tanggal_checkout')->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kamar tidak dapat dihapus karena sedang terisi oleh penghuni.',
+            ], 422);
+        }
+
         $kamar->delete();
 
         return response()->json([

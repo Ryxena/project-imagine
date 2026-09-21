@@ -9,8 +9,8 @@
         $riwayat = $penghunians->whereNotNull('tanggal_checkout')->values();
     @endphp
 
-    <div class="flex items-center justify-between gap-4 animate-in">
-        <div class="relative flex-1 max-w-sm">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 animate-in">
+        <div class="relative w-full sm:flex-1 sm:max-w-sm">
             <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-cream-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                     stroke="currentColor" class="w-4 h-4">
@@ -23,7 +23,7 @@
         </div>
 
         <button onclick="openModal()"
-            class="shrink-0 flex items-center gap-2 bg-sage-700 text-white text-xs font-medium px-4 py-2.5 rounded-md hover:bg-sage-800 hover:shadow-md active:scale-[0.98] transition-all duration-150 ease-out">
+            class="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 bg-sage-700 text-white text-xs font-medium px-4 py-2.5 rounded-md hover:bg-sage-800 hover:shadow-md active:scale-[0.98] transition-all duration-150 ease-out">
             @include('partial.icons.users', ['class' => 'w-3.5 h-3.5'])
             Tambah Penghuni
         </button>
@@ -40,73 +40,91 @@
         </button>
     </div>
 
-    <div id="panel-aktif" class="mt-5 animate-in" style="animation-delay: 0.1s">
-        <div id="penghuni-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse ($aktif as $p)
-                @php
-                    $ditempatkan = !is_null($p->kamar_id);
-                @endphp
-                <div class="penghuni-card aktif-item bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out"
-                    data-name="{{ strtolower($p->name) }}" data-kamar="{{ strtolower($p->nomor_kamar ?? '') }}"
-                    data-id="{{ $p->id }}" data-full-name="{{ addslashes($p->name) }}"
-                    data-email="{{ $p->email }}" data-no-hp="{{ $p->no_hp }}" data-status="{{ $p->status }}"
-                    data-nomor-kamar="{{ $p->nomor_kamar ?? '' }}" data-tipe-kamar="{{ $p->tipe_kamar ?? '' }}"
-                    data-harga="{{ $p->harga ?? '' }}" data-tanggal-masuk="{{ $p->tanggal_masuk ?? '' }}"
-                    data-kamar-id="{{ $p->kamar_id ?? '' }}" data-image="{{ $p->image ?? '' }}">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 min-w-0">
-                            @if ($p->image)
-                                <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
-                                    class="w-10 h-10 rounded-full object-cover border border-sage-200 shrink-0 shadow-sm">
-                            @else
-                                <div
-                                    class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
-                                    {{ strtoupper(substr($p->name, 0, 1)) }}
-                                </div>
-                            @endif
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-cream-900 truncate">{{ $p->name }}</p>
-                                <p class="text-[11px] text-cream-600">
+    <div id="panel-aktif" class="mt-4 animate-in" style="animation-delay: 0.1s">
+        <div class="bg-white rounded-xl border border-cream-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm min-w-[700px]">
+                    <thead>
+                        <tr class="border-b border-cream-200 text-left">
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Penghuni
+                            </th>
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Kamar
+                            </th>
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Status
+                            </th>
+                            <th
+                                class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide text-right">
+                                Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="penghuni-table-body" class="divide-y divide-cream-100">
+                        @forelse ($aktif as $p)
+                            @php $ditempatkan = !is_null($p->kamar_id); @endphp
+                            <tr class="penghuni-row aktif-item hover:bg-cream-50 transition-colors duration-150 group"
+                                data-name="{{ strtolower($p->name) }}" data-kamar="{{ strtolower($p->nomor_kamar ?? '') }}"
+                                data-id="{{ $p->id }}" data-full-name="{{ addslashes($p->name) }}"
+                                data-email="{{ $p->email }}" data-no-hp="{{ $p->no_hp }}"
+                                data-status="{{ $p->status }}" data-nomor-kamar="{{ $p->nomor_kamar ?? '' }}"
+                                data-tipe-kamar="{{ $p->tipe_kamar ?? '' }}" data-harga="{{ $p->harga ?? '' }}"
+                                data-tanggal-masuk="{{ $p->tanggal_masuk ?? '' }}"
+                                data-kamar-id="{{ $p->kamar_id ?? '' }}" data-image="{{ $p->image ?? '' }}">
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        @if ($p->image)
+                                            <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
+                                                class="w-9 h-9 rounded-full object-cover border border-sage-200 shrink-0">
+                                        @else
+                                            <div
+                                                class="w-9 h-9 rounded-full bg-sage-200 text-sage-800 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                {{ strtoupper(substr($p->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <div class="min-w-0">
+                                            <p class="text-sm font-medium text-cream-900 truncate">{{ $p->name }}</p>
+                                            <p class="text-[11px] text-cream-500 truncate">{{ $p->email }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 text-cream-700">
+                                    {{ $ditempatkan ? 'Kamar ' . $p->nomor_kamar : '—' }}
+                                </td>
+                                <td class="px-5 py-3">
                                     @if ($ditempatkan)
-                                        Kamar {{ $p->nomor_kamar }}
+                                        <span
+                                            class="bg-sage-100 text-sage-700 text-[10px] font-semibold px-2.5 py-1 rounded-full">Aktif</span>
                                     @else
-                                        Belum ditempatkan
+                                        <span
+                                            class="bg-amber-100 text-amber-600 text-[10px] font-semibold px-2.5 py-1 rounded-full">Belum
+                                            Ditempatkan</span>
                                     @endif
-                                </p>
-                            </div>
-                        </div>
-                        @if ($ditempatkan)
-                            <span
-                                class="shrink-0 bg-sage-100 text-sage-700 text-[10px] font-semibold px-2.5 py-1 rounded-full">Aktif</span>
-                        @else
-                            <span
-                                class="shrink-0 bg-amber-100 text-amber-600 text-[10px] font-semibold px-2.5 py-1 rounded-full">Belum
-                                Ditempatkan</span>
-                        @endif
-                    </div>
-
-                    <div class="mt-3">
-                        @if ($ditempatkan)
-                            <button onclick="openDetailModal(this.closest('.penghuni-card'))"
-                                class="w-full text-xs font-medium text-cream-700 border border-cream-300 rounded-lg py-2 hover:bg-cream-100 transition-colors duration-150">
-                                Lihat Detail
-                            </button>
-                        @else
-                            <button onclick="openAssignModal({{ $p->id }}, '{{ addslashes($p->name) }}')"
-                                class="w-full flex items-center justify-center gap-2 bg-sage-700 text-white text-xs font-medium py-2.5 rounded-lg hover:bg-sage-800 active:scale-[0.98] transition-all duration-150 ease-out">
-                                Assign ke Kamar
-                            </button>
-                        @endif
-                    </div>
-                </div>
-            @empty
-                <div class="col-span-full bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm">
-                    <p class="text-sm text-cream-600">Belum ada data penghuni.</p>
-                </div>
-            @endforelse
+                                </td>
+                                <td class="px-5 py-3 text-right">
+                                    @if ($ditempatkan)
+                                        <button onclick="openDetailModal(this.closest('tr'))"
+                                            class="text-xs font-medium text-sage-700 hover:text-sage-800 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                            Lihat Detail
+                                        </button>
+                                    @else
+                                        <button
+                                            onclick="openAssignModal({{ $p->id }}, '{{ addslashes($p->name) }}')"
+                                            class="text-xs font-semibold text-white bg-sage-700 px-3.5 py-1.5 rounded-lg hover:bg-sage-800 transition-colors duration-150">
+                                            Assign ke Kamar
+                                        </button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-5 py-10 text-center text-sm text-cream-600">Belum ada data
+                                    penghuni.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        @if ($aktif->count() > 6)
+        @if ($aktif->count() > 8)
             <div id="aktif-pagination" class="flex items-center justify-between pt-4">
                 <p id="aktif-page-info" class="text-xs text-cream-600"></p>
                 <div class="flex gap-2">
@@ -123,42 +141,62 @@
         @endif
     </div>
 
-    <div id="panel-riwayat" class="hidden mt-5 animate-in" style="animation-delay: 0.1s">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            @forelse ($riwayat as $p)
-                <div class="riwayat-item bg-white rounded-xl p-4 shadow-sm border border-cream-200 opacity-80"
-                    data-name="{{ strtolower($p->name) }}">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3 min-w-0">
-                            @if ($p->image)
-                                <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
-                                    class="w-10 h-10 rounded-full object-cover border border-sage-200 shrink-0 shadow-sm">
-                            @else
-                                <div
-                                    class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
-                                    {{ strtoupper(substr($p->name, 0, 1)) }}
-                                </div>
-                            @endif
-                            <div class="min-w-0">
-                                <p class="text-sm font-semibold text-cream-900 truncate">{{ $p->name }}</p>
-                                <p class="text-[11px] text-cream-600">Terakhir di Kamar {{ $p->nomor_kamar ?? '-' }}</p>
-                            </div>
-                        </div>
-                        <span
-                            class="shrink-0 bg-cream-100 text-cream-600 text-[10px] font-semibold px-2.5 py-1 rounded-full">Checkout</span>
-                    </div>
-                    <p class="mt-3 text-[11px] text-cream-600">
-                        Keluar pada {{ \Carbon\Carbon::parse($p->tanggal_checkout)->translatedFormat('d M Y') }}
-                    </p>
-                </div>
-            @empty
-                <div class="col-span-full bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm">
-                    <p class="text-sm text-cream-600">Belum ada riwayat penghuni checkout.</p>
-                </div>
-            @endforelse
+    <div id="panel-riwayat" class="hidden mt-4 animate-in" style="animation-delay: 0.1s">
+        <div class="bg-white rounded-xl border border-cream-200 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm min-w-[700px]">
+                    <thead>
+                        <tr class="border-b border-cream-200 text-left">
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Penghuni
+                            </th>
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Terakhir
+                                di
+                                Kamar</th>
+                            <th class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide">Tanggal
+                                Keluar</th>
+                            <th
+                                class="px-5 py-3 text-[11px] font-semibold text-cream-500 uppercase tracking-wide text-right">
+                                Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-cream-100">
+                        @forelse ($riwayat as $p)
+                            <tr class="riwayat-item hover:bg-cream-50 transition-colors duration-150 opacity-70"
+                                data-name="{{ strtolower($p->name) }}">
+                                <td class="px-5 py-3">
+                                    <div class="flex items-center gap-3 min-w-0">
+                                        @if ($p->image)
+                                            <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
+                                                class="w-9 h-9 rounded-full object-cover border border-cream-200 shrink-0">
+                                        @else
+                                            <div
+                                                class="w-9 h-9 rounded-full bg-cream-200 text-cream-600 text-xs font-semibold flex items-center justify-center shrink-0">
+                                                {{ strtoupper(substr($p->name, 0, 1)) }}
+                                            </div>
+                                        @endif
+                                        <p class="text-sm font-medium text-cream-900 truncate">{{ $p->name }}</p>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 text-cream-700">{{ $p->nomor_kamar ?? '-' }}</td>
+                                <td class="px-5 py-3 text-cream-700">
+                                    {{ \Carbon\Carbon::parse($p->tanggal_checkout)->translatedFormat('d M Y') }}</td>
+                                <td class="px-5 py-3 text-right">
+                                    <span
+                                        class="bg-cream-100 text-cream-600 text-[10px] font-semibold px-2.5 py-1 rounded-full">Checkout</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="px-5 py-10 text-center text-sm text-cream-600">Belum ada riwayat
+                                    penghuni checkout.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
-        @if ($riwayat->count() > 6)
+        @if ($riwayat->count() > 8)
             <div id="riwayat-pagination" class="flex items-center justify-between pt-4">
                 <p id="riwayat-page-info" class="text-xs text-cream-600"></p>
                 <div class="flex gap-2">
@@ -187,7 +225,6 @@
                     </svg>
                 </button>
             </div>
-
             <form id="form-tambah-penghuni" class="px-6 py-5 space-y-4">
                 @csrf
                 <div>
@@ -212,7 +249,6 @@
                 </div>
                 <p id="tambah-error" class="hidden text-xs text-terracotta-600"></p>
             </form>
-
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="closeModal()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
@@ -236,7 +272,6 @@
                     </svg>
                 </button>
             </div>
-
             <div class="px-6 py-5">
                 <div class="flex items-center gap-3">
                     <div id="detail-avatar"
@@ -248,7 +283,6 @@
                             class="inline-block mt-1 bg-sage-100 text-sage-700 text-[10px] font-semibold px-2.5 py-0.5 rounded-full"></span>
                     </div>
                 </div>
-
                 <div class="mt-4 space-y-3 text-sm">
                     <div class="flex justify-between py-2 border-b border-cream-100">
                         <span class="text-cream-500">Kamar</span>
@@ -272,7 +306,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="triggerCheckoutFromDetail()"
                     class="text-sm font-medium text-terracotta-600 hover:text-terracotta-700 transition-colors duration-150 mr-auto">Checkout</button>
@@ -295,7 +328,6 @@
                     </svg>
                 </button>
             </div>
-
             <form id="form-edit" class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Nama Lengkap</label>
@@ -314,7 +346,6 @@
                 </div>
                 <p id="edit-error" class="hidden text-xs text-terracotta-600"></p>
             </form>
-
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="closeEditModal()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
@@ -338,7 +369,6 @@
                     </svg>
                 </button>
             </div>
-
             <form id="form-assign" class="px-6 py-5 space-y-4">
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Kamar Tersedia</label>
@@ -354,7 +384,6 @@
                 </div>
                 <p id="assign-error" class="hidden text-xs text-terracotta-600"></p>
             </form>
-
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
                 <button onclick="closeAssignModal()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
@@ -386,198 +415,79 @@
 
 @push('scripts')
     <script>
-        // ===== Tab, Search & Pagination =====
+        if (new URLSearchParams(window.location.search).get('action') === 'create') {
+            openModal();
+        }
 
-        const PAGE_SIZE = 6;
-
+        const PAGE_SIZE = 8;
         const pageState = {
             aktif: 1,
             riwayat: 1
         };
-
         let currentTab = 'aktif';
-
 
         function switchTab(tab) {
             currentTab = tab;
-
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 const active = btn.dataset.tab === tab;
-
                 btn.classList.toggle('text-sage-700', active);
                 btn.classList.toggle('border-sage-700', active);
-
                 btn.classList.toggle('text-cream-600', !active);
                 btn.classList.toggle('border-transparent', !active);
             });
-
-
-            document.getElementById('panel-aktif')
-                .classList.toggle('hidden', tab !== 'aktif');
-
-            document.getElementById('panel-riwayat')
-                .classList.toggle('hidden', tab !== 'riwayat');
-
-
+            document.getElementById('panel-aktif').classList.toggle('hidden', tab !== 'aktif');
+            document.getElementById('panel-riwayat').classList.toggle('hidden', tab !== 'riwayat');
             pageState[tab] = 1;
-
             renderPagination(tab);
         }
-
-
 
         function renderPagination(tab) {
+            const selector = tab === 'aktif' ? '.aktif-item' : '.riwayat-item';
+            const items = Array.from(document.querySelectorAll(selector)).filter(item => item.dataset.filteredOut !==
+                'true');
+            const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+            if (pageState[tab] > totalPages) pageState[tab] = totalPages;
 
-            const selector = tab === 'aktif' ?
-                '.aktif-item' :
-                '.riwayat-item';
-
-
-            const items = Array.from(
-                document.querySelectorAll(selector)
-            ).filter(item => item.dataset.filteredOut !== 'true');
-
-
-            const totalPages = Math.max(
-                1,
-                Math.ceil(items.length / PAGE_SIZE)
-            );
-
-
-            if (pageState[tab] > totalPages) {
-                pageState[tab] = totalPages;
-            }
-
-            document.querySelectorAll(selector).forEach(item => {
-                item.style.display = 'none';
-            });
-
+            document.querySelectorAll(selector).forEach(item => item.style.display = 'none');
 
             items.forEach((item, index) => {
-
-                const page =
-                    Math.floor(index / PAGE_SIZE) + 1;
-
-
-                if (page === pageState[tab]) {
-                    item.style.display = '';
-                }
-
+                const page = Math.floor(index / PAGE_SIZE) + 1;
+                if (page === pageState[tab]) item.style.display = '';
             });
 
-
-            const infoEl =
-                document.getElementById(`${tab}-page-info`);
-
-            const prevBtn =
-                document.getElementById(`${tab}-btn-prev`);
-
-            const nextBtn =
-                document.getElementById(`${tab}-btn-next`);
-
-
-
-            if (infoEl) {
-                infoEl.textContent =
-                    `Halaman ${pageState[tab]} dari ${totalPages}`;
-            }
-
-
-            if (prevBtn) {
-                prevBtn.disabled =
-                    pageState[tab] <= 1;
-            }
-
-
-            if (nextBtn) {
-                nextBtn.disabled =
-                    pageState[tab] >= totalPages;
-            }
+            const infoEl = document.getElementById(`${tab}-page-info`);
+            const prevBtn = document.getElementById(`${tab}-btn-prev`);
+            const nextBtn = document.getElementById(`${tab}-btn-next`);
+            if (infoEl) infoEl.textContent = `Halaman ${pageState[tab]} dari ${totalPages}`;
+            if (prevBtn) prevBtn.disabled = pageState[tab] <= 1;
+            if (nextBtn) nextBtn.disabled = pageState[tab] >= totalPages;
         }
 
-
-
         function changePage(tab, delta) {
-
             pageState[tab] += delta;
-
             renderPagination(tab);
         }
 
-
-
-        document
-            .getElementById('search-penghuni')
-            .addEventListener('input', function(e) {
-
-
-                const query =
-                    e.target.value.toLowerCase().trim();
-
-
-                const selector =
-                    currentTab === 'aktif' ?
-                    '.aktif-item' :
-                    '.riwayat-item';
-
-
-
-                document
-                    .querySelectorAll(selector)
-                    .forEach(card => {
-
-
-                        const name =
-                            card.dataset.name ?? '';
-
-
-                        const kamar =
-                            card.dataset.kamar ?? '';
-
-
-
-                        const match =
-                            name.includes(query) ||
-                            kamar.includes(query);
-
-
-
-                        card.dataset.filteredOut =
-                            match ? 'false' : 'true';
-
-
-                        card.style.display = '';
-
-                    });
-
-
-
-                pageState[currentTab] = 1;
-
-                renderPagination(currentTab);
-
+        document.getElementById('search-penghuni').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase().trim();
+            const selector = currentTab === 'aktif' ? '.aktif-item' : '.riwayat-item';
+            document.querySelectorAll(selector).forEach(row => {
+                const name = row.dataset.name ?? '';
+                const kamar = row.dataset.kamar ?? '';
+                const match = name.includes(query) || kamar.includes(query);
+                row.dataset.filteredOut = match ? 'false' : 'true';
+                row.style.display = '';
             });
+            pageState[currentTab] = 1;
+            renderPagination(currentTab);
+        });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.aktif-item, .riwayat-item').forEach(item => item.dataset.filteredOut =
+                'false');
+            renderPagination('aktif');
+        });
 
-
-        document.addEventListener(
-            'DOMContentLoaded',
-            () => {
-                document
-                    .querySelectorAll('.aktif-item, .riwayat-item')
-                    .forEach(item => {
-
-                        item.dataset.filteredOut = 'false';
-
-                    });
-
-
-                renderPagination('aktif');
-
-            }
-        );
-
-        // ===== Tambah Penghuni =====
         function openModal() {
             document.getElementById('modal-tambah-penghuni').classList.remove('hidden');
         }
@@ -592,7 +502,6 @@
             const form = document.getElementById('form-tambah-penghuni');
             const errorEl = document.getElementById('tambah-error');
             errorEl.classList.add('hidden');
-
             const formData = new FormData(form);
             const payload = {
                 name: formData.get('name'),
@@ -600,13 +509,11 @@
                 no_hp: formData.get('no_hp'),
                 password: formData.get('password'),
             };
-
             if (!payload.name || !payload.email || !payload.no_hp || !payload.password) {
                 errorEl.textContent = 'Semua field wajib diisi.';
                 errorEl.classList.remove('hidden');
                 return;
             }
-
             try {
                 const res = await fetch('{{ route('admin.penghuni.store') }}', {
                     method: 'POST',
@@ -618,13 +525,11 @@
                     body: JSON.stringify(payload),
                 });
                 const json = await res.json();
-
                 if (!res.ok || !json.success) {
                     errorEl.textContent = json.message || 'Gagal menambahkan penghuni.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
-
                 window.location.reload();
             } catch (err) {
                 errorEl.textContent = 'Terjadi kesalahan jaringan.';
@@ -632,16 +537,12 @@
             }
         }
 
-        // ===== Detail Modal =====
         let currentDetail = null;
 
-        function openDetailModal(cardEl) {
-            const d = cardEl.dataset;
+        function openDetailModal(rowEl) {
+            const d = rowEl.dataset;
             currentDetail = d;
-
             const avatarContainer = document.getElementById('detail-avatar');
-
-            // Sinkronisasi Foto Profil di Modal Detail
             if (d.image && d.image.trim() !== '') {
                 avatarContainer.innerHTML =
                     `<img src="/storage/${d.image}" alt="Foto ${d.fullName}" class="w-full h-full rounded-full object-cover">`;
@@ -652,24 +553,20 @@
                 avatarContainer.className =
                     "w-12 h-12 rounded-full bg-sage-200 text-sage-800 text-base font-semibold flex items-center justify-center shrink-0";
             }
-
             document.getElementById('detail-nama').textContent = d.fullName;
             document.getElementById('detail-status').textContent = 'Aktif';
             document.getElementById('detail-kamar').textContent = d.nomorKamar ? `${d.nomorKamar} · ${d.tipeKamar}` :
                 'Belum ditempatkan';
-            document.getElementById('detail-harga').textContent = d.harga ?
-                'Rp' + Number(d.harga).toLocaleString('id-ID') + ' / bulan' :
-                '-';
+            document.getElementById('detail-harga').textContent = d.harga ? 'Rp' + Number(d.harga).toLocaleString('id-ID') +
+                ' / bulan' : '-';
             document.getElementById('detail-hp').textContent = d.noHp;
             document.getElementById('detail-email').textContent = d.email;
-            document.getElementById('detail-tanggal').textContent = d.tanggalMasuk ?
-                new Date(d.tanggalMasuk).toLocaleDateString('id-ID', {
+            document.getElementById('detail-tanggal').textContent = d.tanggalMasuk ? new Date(d.tanggalMasuk)
+                .toLocaleDateString('id-ID', {
                     day: 'numeric',
                     month: 'long',
                     year: 'numeric'
-                }) :
-                '-';
-
+                }) : '-';
             document.getElementById('modal-detail').classList.remove('hidden');
         }
 
@@ -694,7 +591,6 @@
             document.getElementById('modal-edit').classList.remove('hidden');
         }
 
-        // ===== Edit Modal =====
         function closeEditModal() {
             document.getElementById('modal-edit').classList.add('hidden');
             document.getElementById('edit-error').classList.add('hidden');
@@ -704,7 +600,6 @@
             const modal = document.getElementById('modal-edit');
             const errorEl = document.getElementById('edit-error');
             errorEl.classList.add('hidden');
-
             const payload = {
                 name: document.getElementById('edit-name').value,
                 email: document.getElementById('edit-email').value,
@@ -713,13 +608,11 @@
                 kamar_id: modal.dataset.kamarId || null,
                 tanggal_masuk: modal.dataset.tanggalMasuk,
             };
-
             if (!payload.name || !payload.email || !payload.no_hp) {
                 errorEl.textContent = 'Semua field wajib diisi.';
                 errorEl.classList.remove('hidden');
                 return;
             }
-
             try {
                 const res = await fetch(`/admin/penghuni/${modal.dataset.id}`, {
                     method: 'PUT',
@@ -731,13 +624,11 @@
                     body: JSON.stringify(payload),
                 });
                 const json = await res.json();
-
                 if (!res.ok || !json.success) {
                     errorEl.textContent = json.message || 'Gagal menyimpan perubahan.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
-
                 window.location.reload();
             } catch (err) {
                 errorEl.textContent = 'Terjadi kesalahan jaringan.';
@@ -745,32 +636,27 @@
             }
         }
 
-        // ===== Assign Modal =====
         let currentAssignId = null;
 
         async function openAssignModal(penghunianId, nama) {
             currentAssignId = penghunianId;
             document.getElementById('assign-nama').textContent = nama;
             document.getElementById('modal-assign').classList.remove('hidden');
-
             const select = document.getElementById('assign-kamar-select');
             select.innerHTML = '<option value="">Memuat kamar tersedia...</option>';
-
             try {
                 const res = await fetch('{{ route('admin.penghuni.daftarkamar') }}', {
                     headers: {
                         'Accept': 'application/json'
-                    },
+                    }
                 });
                 const json = await res.json();
-
                 if (json.data.length === 0) {
                     select.innerHTML = '<option value="">Tidak ada kamar kosong</option>';
                     return;
                 }
-
-                select.innerHTML = '<option value="">Pilih kamar</option>' +
-                    json.data.map(k => `<option value="${k.id}">${k.nomor_kamar}</option>`).join('');
+                select.innerHTML = '<option value="">Pilih kamar</option>' + json.data.map(k =>
+                    `<option value="${k.id}">${k.nomor_kamar}</option>`).join('');
             } catch (err) {
                 select.innerHTML = '<option value="">Gagal memuat kamar</option>';
             }
@@ -787,13 +673,11 @@
             const tanggal = document.getElementById('assign-tanggal').value;
             const errorEl = document.getElementById('assign-error');
             errorEl.classList.add('hidden');
-
             if (!kamarId || !tanggal) {
                 errorEl.textContent = 'Pilih kamar dan tanggal masuk.';
                 errorEl.classList.remove('hidden');
                 return;
             }
-
             try {
                 const res = await fetch(`/admin/penghuni/assignkamar/${currentAssignId}`, {
                     method: 'PUT',
@@ -808,13 +692,11 @@
                     }),
                 });
                 const json = await res.json();
-
                 if (!res.ok || !json.success) {
                     errorEl.textContent = json.message || 'Gagal assign kamar.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
-
                 window.location.reload();
             } catch (err) {
                 errorEl.textContent = 'Terjadi kesalahan jaringan.';
@@ -822,7 +704,6 @@
             }
         }
 
-        // ===== Checkout Modal =====
         let currentCheckoutId = null;
 
         function openCheckoutModal(penghunianId, nama) {
@@ -840,7 +721,6 @@
         async function submitCheckout() {
             const errorEl = document.getElementById('checkout-error');
             errorEl.classList.add('hidden');
-
             try {
                 const res = await fetch(`/admin/penghuni/checkoutkamar/${currentCheckoutId}`, {
                     method: 'PUT',
@@ -850,13 +730,11 @@
                     },
                 });
                 const json = await res.json();
-
                 if (!res.ok || !json.success) {
                     errorEl.textContent = json.message || 'Gagal checkout.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
-
                 window.location.reload();
             } catch (err) {
                 errorEl.textContent = 'Terjadi kesalahan jaringan.';

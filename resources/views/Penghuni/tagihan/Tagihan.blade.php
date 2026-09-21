@@ -4,8 +4,10 @@
 @section('page-subtitle', 'Kelola pembayaran sewa kamar Anda.')
 
 @section('content')
+    @include('partial.tenant-status-banner')
+
     @php
-        $tagihanDitolak = $aktif->firstWhere('status_pembayaran', 'ditolak');
+        $tagihanDitolak = $aktif->count() > 0 ? $aktif->firstWhere('status_pembayaran', 'ditolak') : null;
     @endphp
 
     @if ($aktif->count() > 0)
@@ -136,8 +138,47 @@
             </div>
         </div>
     @else
-        <div class="bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm animate-in">
-            <p class="text-sm text-cream-600">Tidak ada tagihan yang perlu ditindaklanjuti. Semua beres!</p>
+        <div class="bg-white rounded-xl border border-cream-200 px-6 py-10 text-center shadow-sm animate-in">
+            @if (in_array($tenantStatus, ['unassigned', 'no_record']))
+                <div
+                    class="w-12 h-12 rounded-full bg-cream-100 text-cream-600 flex items-center justify-center mx-auto mb-3">
+                    @include('partial.icons.receipt', ['class' => 'w-6 h-6'])
+                </div>
+                <p class="text-base font-bold text-cream-900">Belum Ada Tagihan</p>
+                <p class="text-xs text-cream-600 mt-1 max-w-sm mx-auto leading-relaxed">
+                    Tagihan sewa kamar akan muncul di sini setelah Anda resmi ditempatkan ke kamar oleh pengelola.
+                </p>
+            @elseif ($tenantStatus === 'checked_out')
+                <div
+                    class="w-12 h-12 rounded-full bg-cream-100 text-cream-600 flex items-center justify-center mx-auto mb-3">
+                    @include('partial.icons.door', ['class' => 'w-6 h-6'])
+                </div>
+                <p class="text-base font-bold text-cream-900">Tidak Ada Tagihan Aktif</p>
+                <p class="text-xs text-cream-600 mt-1 max-w-sm mx-auto leading-relaxed">
+                    Masa tinggal Anda telah berakhir, sehingga tidak ada tagihan pembayaran baru.
+                </p>
+            @else
+                @if ($hasPaidHistory)
+                    <div
+                        class="w-12 h-12 rounded-full bg-sage-100 text-sage-700 flex items-center justify-center mx-auto mb-3">
+                        @include('partial.icons.shield', ['class' => 'w-6 h-6'])
+                    </div>
+                    <p class="text-base font-bold text-sage-900">Semua Tagihan Sudah Lunas!</p>
+                    <p class="text-xs text-cream-600 mt-1 max-w-sm mx-auto leading-relaxed">
+                        Terima kasih sudah membayar tepat waktu. Kamu bisa beristirahat dengan tenang tanpa ada tanggungan.
+                    </p>
+                @else
+                    <div
+                        class="w-12 h-12 rounded-full bg-sage-100 text-sage-700 flex items-center justify-center mx-auto mb-3">
+                        @include('partial.icons.receipt', ['class' => 'w-6 h-6'])
+                    </div>
+                    <p class="text-base font-bold text-sage-900">Belum Ada Tagihan Bulan Ini</p>
+                    <p class="text-xs text-cream-600 mt-1 max-w-sm mx-auto leading-relaxed">
+                        Kamu sudah terdaftar di kamar, namun pengelola belum menerbitkan tagihan aktif untuk periode ini.
+                        Santai dulu!
+                    </p>
+                @endif
+            @endif
         </div>
     @endif
 
@@ -155,24 +196,33 @@
                         );
                         $bayar = $t->pembayaran->firstWhere('status_verifikasi', 'success');
                     @endphp
-                    <div class="riwayat-tagihan-item flex items-center gap-4 px-5 py-3.5">
+                    <div
+                        class="riwayat-tagihan-item flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 px-5 py-4">
+                        <div class="flex items-center gap-3.5 min-w-0">
+                            <div
+                                class="w-8 h-8 rounded-full bg-sage-100 text-sage-700 flex items-center justify-center shrink-0">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
+                                    stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                </svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-cream-900 truncate">{{ $bulanLabel }}</p>
+                                @if ($bayar)
+                                    <p class="text-[11px] text-cream-600 truncate">Dibayar pada
+                                        {{ \Carbon\Carbon::parse($bayar->tanggal_pembayaran)->translatedFormat('d M Y') }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
                         <div
-                            class="w-8 h-8 rounded-full bg-sage-100 text-sage-700 flex items-center justify-center shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
-                                stroke="currentColor" class="w-4 h-4">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
-                            </svg>
+                            class="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-0 border-cream-100">
+                            <p class="text-sm font-semibold text-cream-900">Rp{{ number_format($t->jumlah, 0, ',', '.') }}
+                            </p>
+                            <span
+                                class="bg-sage-100 text-sage-700 text-[10px] font-semibold px-2.5 py-1 rounded-full shrink-0">Lunas</span>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-sm font-medium text-cream-900">{{ $bulanLabel }}</p>
-                            @if ($bayar)
-                                <p class="text-[11px] text-cream-600">Dibayar pada
-                                    {{ \Carbon\Carbon::parse($bayar->tanggal_pembayaran)->translatedFormat('d M Y') }}</p>
-                            @endif
-                        </div>
-                        <p class="text-sm font-semibold text-cream-900">Rp{{ number_format($t->jumlah, 0, ',', '.') }}</p>
-                        <span
-                            class="bg-sage-100 text-sage-700 text-[10px] font-semibold px-2.5 py-1 rounded-full">Lunas</span>
+
                     </div>
                 @endforeach
             @else
@@ -238,7 +288,7 @@
             formData.append('tanggal_pembayaran', new Date().toISOString().slice(0, 10));
 
             try {
-                const res = await fetch('{{ route('penghuni.pembayaran.store') }}', {
+                const res = await fetch("{{ route('penghuni.pembayaran.store') }}", {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -257,6 +307,7 @@
                 errorEl.textContent = err.message || 'Terjadi kesalahan jaringan.';
                 errorEl.classList.remove('hidden');
 
+                submitBtn.disabled = status;
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalBtnHtml;
                 submitBtn.classList.remove('opacity-80', 'cursor-not-allowed');

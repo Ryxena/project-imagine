@@ -21,20 +21,43 @@
                 };
             @endphp
             <div
-                class="bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col">
-                <div class="flex items-center justify-between">
-                    <span
-                        class="{{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
-                    <p class="text-[11px] text-cream-500">
-                        {{ \Carbon\Carbon::parse($p->tanggal_publish)->translatedFormat('d M Y') }}</p>
+                class="bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span
+                            class="{{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
+                        <p class="text-[11px] text-cream-500">
+                            {{ \Carbon\Carbon::parse($p->tanggal_publish)->translatedFormat('d M Y') }}
+                        </p>
+                    </div>
+                    <p class="mt-3 text-sm font-semibold text-cream-900">{{ $p->judul }}</p>
+                    <p class="mt-1.5 text-xs text-cream-600 line-clamp-3">{{ $p->deskripsi }}</p>
                 </div>
-                <p class="mt-3 text-sm font-semibold text-cream-900">{{ $p->judul }}</p>
-                <p class="mt-1.5 text-xs text-cream-600 line-clamp-3 flex-1">{{ $p->deskripsi }}</p>
-                <div class="mt-3 pt-3 border-t border-cream-100 flex justify-end">
+
+                <div class="mt-4 pt-3 border-t border-cream-100 flex items-center justify-between">
                     <button onclick="openDetailModal({{ $p->id }})"
                         class="text-xs font-medium text-sage-700 hover:text-sage-800 transition-colors duration-150">
                         Lihat Detail
                     </button>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="openEditModal({{ $p->id }})" title="Edit Pengumuman"
+                            class="w-7 h-7 rounded-lg text-cream-400 hover:text-sage-700 hover:bg-sage-50 flex items-center justify-center transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                            </svg>
+                        </button>
+                        <button onclick="openDeleteModal({{ $p->id }}, '{{ addslashes($p->judul) }}')"
+                            title="Hapus Pengumuman"
+                            class="w-7 h-7 rounded-lg text-cream-400 hover:text-terracotta-600 hover:bg-terracotta-50 flex items-center justify-center transition-colors">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         @empty
@@ -50,16 +73,15 @@
         </div>
     @endif
 
-    <div id="modal-create" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-cream-900/40" onclick="closeCreateModal()"></div>
+    <div id="modal-form" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-cream-900/40" onclick="closeFormModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-lg animate-in">
             <div class="flex items-center justify-between px-6 py-4 border-b border-cream-200">
                 <div>
-                    <h3 class="text-base font-semibold text-cream-900">Buat Pengumuman Baru</h3>
-                    <p class="mt-0.5 text-xs text-cream-600">Akan langsung terbit dan dapat dibaca seluruh penghuni aktif.
-                    </p>
+                    <h3 id="form-modal-title" class="text-base font-semibold text-cream-900">Buat Pengumuman Baru</h3>
+                    <p class="mt-0.5 text-xs text-cream-600">Informasi akan disebarkan ke seluruh penghuni aktif.</p>
                 </div>
-                <button onclick="closeCreateModal()"
+                <button onclick="closeFormModal()"
                     class="text-cream-400 hover:text-cream-700 transition-colors duration-150 shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="w-5 h-5">
@@ -68,16 +90,20 @@
                 </button>
             </div>
 
-            <form id="form-create" class="px-6 py-5 space-y-4">
+            <form id="pengumuman-form" class="px-6 py-5 space-y-4">
                 @csrf
+                <input type="hidden" id="pengumuman-id" name="id">
+                <input type="hidden" id="form-method" value="POST">
+
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Judul Pengumuman</label>
-                    <input type="text" name="judul" required placeholder="Contoh: Jadwal Pemadaman Listrik"
+                    <input type="text" id="input-judul" name="judul" required
+                        placeholder="Contoh: Jadwal Pemadaman Listrik"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Kategori</label>
-                    <select name="type" required
+                    <select id="input-type" name="type" required
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                         <option value="umum">Umum</option>
                         <option value="informasi">Informasi</option>
@@ -86,16 +112,17 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Isi Pengumuman</label>
-                    <textarea name="deskripsi" rows="5" required placeholder="Tuliskan detail pengumuman di sini..."
+                    <textarea id="input-deskripsi" name="deskripsi" rows="5" required
+                        placeholder="Tuliskan detail pengumuman di sini..."
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150 resize-none"></textarea>
                 </div>
-                <p id="create-error" class="hidden text-xs text-terracotta-600"></p>
+                <p id="form-error" class="hidden text-xs text-terracotta-600"></p>
             </form>
 
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
-                <button onclick="closeCreateModal()"
+                <button onclick="closeFormModal()"
                     class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
-                <button onclick="submitCreate()"
+                <button onclick="submitPengumumanForm()" id="form-submit-btn"
                     class="bg-sage-700 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-sage-800 active:scale-[0.98] transition-all duration-150 ease-out">Umumkan</button>
             </div>
         </div>
@@ -108,7 +135,7 @@
                 <div class="min-w-0">
                     <div class="flex items-center gap-2">
                         <span id="dd-badge" class="text-[10px] font-semibold px-2.5 py-1 rounded-full"></span>
-                        <p id="dd-tanggal" class="text-[11px] text-cream-500"></p>
+                        <p id="dd-tanggal" class="text-[11px] text-cream-500 font-medium"></p>
                     </div>
                     <h3 id="dd-judul" class="mt-2 text-base font-semibold text-cream-900"></h3>
                 </div>
@@ -116,7 +143,7 @@
                     class="text-cream-400 hover:text-cream-700 transition-colors duration-150 shrink-0">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="w-5 h-5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>
                 </button>
             </div>
@@ -129,10 +156,34 @@
             </div>
         </div>
     </div>
+
+    <div id="modal-delete" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-cream-900/40" onclick="closeDeleteModal()"></div>
+        <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-sm p-6 text-center animate-in">
+            <div
+                class="w-12 h-12 rounded-2xl bg-terracotta-100 text-terracotta-600 flex items-center justify-center mx-auto mb-4">
+                @include('partial.icons.warning', ['class' => 'w-6 h-6'])
+            </div>
+            <h3 class="text-base font-semibold text-cream-900">Hapus Pengumuman?</h3>
+            <p id="delete-message" class="text-xs text-cream-600 mt-1 leading-relaxed"></p>
+            <input type="hidden" id="delete-id">
+            <div class="mt-6 flex items-center justify-center gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="w-full text-xs font-semibold text-cream-700 bg-cream-100 hover:bg-cream-200 py-2.5 rounded-xl transition-colors">Batal</button>
+                <button onclick="executeDelete()"
+                    class="w-full text-xs font-semibold text-white bg-terracotta-600 hover:bg-terracotta-700 py-2.5 rounded-xl transition-colors">Ya,
+                    Hapus</button>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
     <script>
+        if (new URLSearchParams(window.location.search).get('action') === 'create') {
+            openCreateModal();
+        }
+
         const pengumumanData = @json($pengumuman->keyBy('id'));
 
         const typeMeta = {
@@ -151,25 +202,44 @@
         };
 
         function openCreateModal() {
-            document.getElementById('modal-create').classList.remove('hidden');
+            document.getElementById('form-modal-title').textContent = 'Buat Pengumuman Baru';
+            document.getElementById('form-submit-btn').textContent = 'Umumkan';
+            document.getElementById('form-method').value = 'POST';
+            document.getElementById('pengumuman-id').value = '';
+            document.getElementById('pengumuman-form').reset();
+            document.getElementById('form-error').classList.add('hidden');
+            document.getElementById('modal-form').classList.remove('hidden');
         }
 
-        function closeCreateModal() {
-            document.getElementById('modal-create').classList.add('hidden');
-            document.getElementById('form-create').reset();
-            document.getElementById('create-error').classList.add('hidden');
+        function openEditModal(id) {
+            const p = pengumumanData[id];
+            document.getElementById('form-modal-title').textContent = 'Edit Pengumuman';
+            document.getElementById('form-submit-btn').textContent = 'Simpan Perubahan';
+            document.getElementById('form-method').value = 'PUT';
+            document.getElementById('pengumuman-id').value = p.id;
+
+            document.getElementById('input-judul').value = p.judul;
+            document.getElementById('input-type').value = p.type;
+            document.getElementById('input-deskripsi').value = p.deskripsi;
+
+            document.getElementById('form-error').classList.add('hidden');
+            document.getElementById('modal-form').classList.remove('hidden');
         }
 
-        async function submitCreate() {
-            const form = document.getElementById('form-create');
-            const errorEl = document.getElementById('create-error');
+        function closeFormModal() {
+            document.getElementById('modal-form').classList.add('hidden');
+        }
+
+        async function submitPengumumanForm() {
+            const method = document.getElementById('form-method').value;
+            const id = document.getElementById('pengumuman-id').value;
+            const errorEl = document.getElementById('form-error');
             errorEl.classList.add('hidden');
 
-            const formData = new FormData(form);
             const payload = {
-                judul: formData.get('judul'),
-                type: formData.get('type'),
-                deskripsi: formData.get('deskripsi'),
+                judul: document.getElementById('input-judul').value,
+                type: document.getElementById('input-type').value,
+                deskripsi: document.getElementById('input-deskripsi').value,
                 tanggal_publish: new Date().toISOString().slice(0, 10),
             };
 
@@ -179,9 +249,14 @@
                 return;
             }
 
+            let url = '{{ route('admin.pengumuman.store') }}';
+            if (method === 'PUT') {
+                url = `/admin/pengumuman/${id}`;
+            }
+
             try {
-                const res = await fetch('{{ route('admin.pengumuman.store') }}', {
-                    method: 'POST',
+                const res = await fetch(url, {
+                    method: method,
                     headers: {
                         'Content-Type': 'application/json',
                         'Accept': 'application/json',
@@ -192,7 +267,7 @@
                 const json = await res.json();
 
                 if (!res.ok || !json.success) {
-                    errorEl.textContent = json.message || 'Gagal membuat pengumuman.';
+                    errorEl.textContent = json.message || 'Gagal menyimpan pengumuman.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
@@ -212,11 +287,16 @@
             badgeEl.className = 'text-[10px] font-semibold px-2.5 py-1 rounded-full ' + meta.badge;
             badgeEl.textContent = meta.label;
 
-            document.getElementById('dd-tanggal').textContent = new Date(p.tanggal_publish).toLocaleDateString('id-ID', {
+            const createdAt = new Date(p.created_at || p.tanggal_publish);
+            const options = {
                 day: 'numeric',
                 month: 'long',
-                year: 'numeric'
-            });
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('dd-tanggal').textContent = createdAt.toLocaleDateString('id-ID', options) + ' WIB';
+
             document.getElementById('dd-judul').textContent = p.judul;
             document.getElementById('dd-deskripsi').textContent = p.deskripsi;
 
@@ -225,6 +305,40 @@
 
         function closeDetailModal() {
             document.getElementById('modal-detail').classList.add('hidden');
+        }
+
+        function openDeleteModal(id, judul) {
+            document.getElementById('delete-id').value = id;
+            document.getElementById('delete-message').innerHTML =
+                `Apakah Anda yakin ingin menghapus pengumuman <strong>"${judul}"</strong>?`;
+            document.getElementById('modal-delete').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('modal-delete').classList.add('hidden');
+        }
+
+        async function executeDelete() {
+            const id = document.getElementById('delete-id').value;
+            try {
+                const res = await fetch(`/admin/pengumuman/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                });
+                const json = await res.json();
+
+                if (!res.ok || !json.success) {
+                    alert(json.message || 'Gagal menghapus pengumuman.');
+                    return;
+                }
+
+                window.location.reload();
+            } catch (err) {
+                alert('Terjadi kesalahan jaringan.');
+            }
         }
     </script>
 @endpush

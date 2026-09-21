@@ -4,6 +4,7 @@ namespace App\Http\Controllers\penghuni;
 
 use App\Http\Controllers\Controller;
 use App\Models\Keluhan;
+use App\Models\Penghunian;
 use App\Models\Pengumuman;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
@@ -14,6 +15,14 @@ class PenghuniDashboardController extends Controller
     {
         $userId = $request->user()->id;
 
+        $latestPenghunian = Penghunian::where('user_id', $userId)->latest()->first();
+        $tenantStatus = match (true) {
+            ! $latestPenghunian => 'no_record',
+            ! is_null($latestPenghunian->tanggal_checkout) => 'checked_out',
+            is_null($latestPenghunian->kamar_id) => 'unassigned',
+            default => 'active',
+        };
+
         $tagihanAktifList = Tagihan::query()
             ->whereHas('penghunian', fn ($q) => $q->where('user_id', $userId))
             ->with(['pembayaran', 'penghunian.kamar:id,nomor_kamar'])
@@ -23,7 +32,6 @@ class PenghuniDashboardController extends Controller
             ->values();
 
         $tagihanHero = $tagihanAktifList->first();
-
         $tagihanDitolakLain = $tagihanAktifList
             ->where('status_pembayaran', 'ditolak')
             ->reject(fn ($t) => $tagihanHero && $t->id === $tagihanHero->id)
@@ -36,10 +44,8 @@ class PenghuniDashboardController extends Controller
         $pengumumanTerbaru = Pengumuman::latest()->first();
 
         return view('Penghuni.dashboard.index', compact(
-            'tagihanHero',
-            'tagihanDitolakLain',
-            'keluhanAktifCount',
-            'pengumumanTerbaru'
+            'tagihanHero', 'tagihanDitolakLain', 'keluhanAktifCount',
+            'pengumumanTerbaru', 'tenantStatus', 'latestPenghunian'
         ));
     }
 

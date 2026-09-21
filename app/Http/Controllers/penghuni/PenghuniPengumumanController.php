@@ -11,9 +11,11 @@ class PenghuniPengumumanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pengumumans = Pengumuman::with('admin:id,name,image') // <--- Tambahkan ',image' di sini
+        $request->user()->update(['last_read_pengumuman_penghuni' => now()]);
+
+        $pengumumans = Pengumuman::with('admin:id,name,image')
             ->latest()
             ->paginate(4);
 
