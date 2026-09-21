@@ -12,7 +12,7 @@ class ManajemenPengumumanController extends Controller
     {
         $pengumuman = Pengumuman::with('admin:id,name')
             ->latest()
-            ->get();
+            ->paginate(6);
 
         return view('admin.pengumuman.ManajemenPengumuman', compact('pengumuman'));
     }

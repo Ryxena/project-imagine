@@ -11,7 +11,7 @@ class ManajemenKeluhanController extends Controller
     public function index(Request $request)
     {
         $keluhans = Keluhan::with([
-            'user:id,name',
+            'user:id,name,image',   
             'user.penghunian' => function ($query) {
                 $query->select('id', 'user_id', 'kamar_id', 'tanggal_masuk')->latest();
             },

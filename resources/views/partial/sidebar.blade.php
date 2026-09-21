@@ -12,8 +12,8 @@
             ['route' => 'admin.pengumuman.index', 'label' => 'Pengumuman', 'icon' => 'megaphone'],
         ]
         : [
+            ['route' => 'penghuni.dashboard', 'label' => 'Dashboard', 'icon' => 'grid'],
             ['route' => 'penghuni.tagihan.index', 'label' => 'Tagihan', 'icon' => 'receipt'],
-            ['route' => 'penghuni.pembayaran.index', 'label' => 'Pembayaran', 'icon' => 'shield'],
             ['route' => 'penghuni.keluhan.index', 'label' => 'Keluhan', 'icon' => 'warning'],
             ['route' => 'penghuni.pengumuman.index', 'label' => 'Pengumuman', 'icon' => 'megaphone'],
         ];
@@ -38,16 +38,16 @@
     ">
     <div>
         <div class="px-5 py-6 flex items-center">
-            <div class="w-8 h-8 rounded-lg bg-sage-500 border border-sage-400 flex items-center justify-center shrink-0 relative overflow-hidden cursor-pointer hover:bg-sage-600/50 transition-colors duration-200"
+            <div class="w-8 h-8 flex items-center justify-center shrink-0 relative cursor-pointer hover:opacity-80 transition-opacity duration-200"
                 onclick="handleSidebarLogoClick()">
-                <span class="text-white font-extrabold text-[15px] z-10">logo</span>
-                <div class="absolute bottom-0 w-full h-1/3 bg-sage-600/50"></div>
+                <img src="{{ asset('images/logo.png') }}" alt="Logo Icon" class="w-full h-full object-contain">
             </div>
-
             <div
-                class="sidebar-text ml-3 overflow-hidden whitespace-nowrap transition-all duration-300 opacity-100 flex-1 w-full">
-                <h1 class="text-lg font-bold text-white leading-tight">NgekostYuk</h1>
-                <p class="text-[11px] text-sage-200 mt-0.5">Kelola Kost, Tanpa Ribet!</p>
+                class="sidebar-text ml-2 overflow-hidden whitespace-nowrap transition-all duration-300 opacity-100 flex flex-col justify-center">
+                <h1 class="text-xl font-bold leading-none mb-1.5">
+                    <span class="text-white">Ngekost</span><span class="text-terracotta-400">Yuk</span>
+                </h1>
+                <p class="text-[11px] text-sage-200 leading-none">Kelola Kost, Tanpa Ribet!</p>
             </div>
         </div>
 
@@ -59,12 +59,12 @@
 
                 <div class="relative px-3">
                     <a href="{{ route($item['route']) }}" onclick="closeMobileSidebar()"
-                        class="group relative z-10 flex items-center px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ease-out
+                        class="group relative z-10 flex items-center px-4 py-2 rounded-xl text-[13px] font-medium transition-all duration-200 ease-out
                         {{ $active ? 'bg-cream-page text-sage-900' : 'text-sage-100 hover:bg-sage-600 hover:text-white' }}">
 
                         <span
                             class="w-5 flex justify-center shrink-0 transition-colors duration-200 {{ $active ? 'text-sage-700' : 'text-sage-300 group-hover:text-white' }}">
-                            @include('partial.icons.' . $item['icon'], ['class' => 'w-4 h-4'])
+                            @include('partial.icons.' . $item['icon'], ['class' => 'w-8 h-8'])
                         </span>
 
                         <span
@@ -80,10 +80,17 @@
     <div class="relative">
         <button onclick="toggleUserMenu()" id="user-menu-btn"
             class="w-full px-5 py-4 border-t border-sage-600 flex items-center transition-colors duration-150 hover:bg-sage-600">
-            <div
-                class="w-8 h-8 rounded-full bg-sage-500 flex items-center justify-center text-white font-semibold text-xs shrink-0 border border-sage-400">
-                {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-            </div>
+
+            @if (auth()->user()->image)
+                <img src="{{ asset('storage/' . auth()->user()->image) }}" alt="Foto {{ auth()->user()->name }}"
+                    class="w-8 h-8 rounded-full object-cover shrink-0 border border-sage-400 shadow-sm">
+            @else
+                <div
+                    class="w-8 h-8 rounded-full bg-sage-500 flex items-center justify-center text-white font-semibold text-xs shrink-0 border border-sage-400">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            @endif
+
             <div
                 class="sidebar-text ml-3 overflow-hidden whitespace-nowrap transition-all duration-300 opacity-100 min-w-0 flex-1 text-left w-full">
                 <p class="text-[13px] font-semibold text-white truncate">{{ auth()->user()->name }}</p>
@@ -115,37 +122,37 @@
         </div>
     </div>
 
-    <div id="modal-logout" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-cream-900/40" onclick="closeLogoutModal()"></div>
-        <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-sm animate-in">
-            <div class="px-6 py-5">
-                <div class="flex items-center gap-3">
-                    <div
-                        class="w-10 h-10 rounded-full bg-terracotta-100 text-terracotta-600 flex items-center justify-center shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-5 h-5">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-                        </svg>
-                    </div>
-                    <h3 class="text-base font-semibold text-cream-900">Keluar dari akun?</h3>
+</aside>
+<div id="modal-logout" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-cream-900/40" onclick="closeLogoutModal()"></div>
+    <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-sm animate-in">
+        <div class="px-6 py-5">
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-10 h-10 rounded-full bg-terracotta-100 text-terracotta-600 flex items-center justify-center shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="w-5 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                    </svg>
                 </div>
-                <p class="mt-3 text-sm text-cream-600">Kamu perlu login kembali untuk mengakses dashboard.</p>
+                <h3 class="text-base font-semibold text-cream-900">Keluar dari akun?</h3>
             </div>
-            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
-                <button onclick="closeLogoutModal()"
-                    class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit"
-                        class="bg-terracotta-600 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-terracotta-700 active:scale-[0.98] transition-all duration-150 ease-out">
-                        Ya, Keluar
-                    </button>
-                </form>
-            </div>
+            <p class="mt-3 text-sm text-cream-600">Kamu perlu login kembali untuk mengakses dashboard.</p>
+        </div>
+        <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-200">
+            <button onclick="closeLogoutModal()"
+                class="text-sm font-medium text-cream-600 hover:text-cream-900 transition-colors duration-150">Batal</button>
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit"
+                    class="bg-terracotta-600 text-white text-sm font-medium px-5 py-2.5 rounded-full hover:bg-terracotta-700 active:scale-[0.98] transition-all duration-150 ease-out">
+                    Ya, Keluar
+                </button>
+            </form>
         </div>
     </div>
-</aside>
+</div>
 
 <script>
     if (localStorage.getItem('sidebar_collapsed') === 'true') {

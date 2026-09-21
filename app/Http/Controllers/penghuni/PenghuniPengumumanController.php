@@ -13,15 +13,11 @@ class PenghuniPengumumanController extends Controller
      */
     public function index()
     {
-        //
-        $pengumuman = Pengumuman::with('admin:id,name')
+        $pengumumans = Pengumuman::with('admin:id,name,image') // <--- Tambahkan ',image' di sini
             ->latest()
-            ->get();
+            ->paginate(4);
 
-        return response()->json([
-            'success' => true,
-            'data' => $pengumuman,
-        ]);
+        return view('penghuni.pengumuman.Pengumuman', compact('pengumumans'));
     }
 
     /**

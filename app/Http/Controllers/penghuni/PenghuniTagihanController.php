@@ -5,6 +5,7 @@ namespace App\Http\Controllers\penghuni;
 use App\Http\Controllers\Controller;
 use App\Models\Tagihan;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PenghuniTagihanController extends Controller
 {
@@ -18,26 +19,34 @@ class PenghuniTagihanController extends Controller
      */
     public function index(Request $request)
     {
-        $status = $request->query('status');
+        $userId = $request->user()->id;
 
         $tagihans = Tagihan::query()
-            ->whereHas('penghunian', function ($query) use ($request) {
-                $query->where('user_id', $request->user()->id);
-            })
-            ->with([
-                'pembayaran',
-                'penghunian.kamar:id,nomor_kamar,tipe_kamar,harga',
-            ])
+            ->whereHas('penghunian', fn ($q) => $q->where('user_id', $userId))
+            ->with(['pembayaran', 'penghunian.kamar:id,nomor_kamar,tipe_kamar,harga'])
             ->latest()
-            ->get()
-            ->when($status, function ($tagihans) use ($status) {
-                return $tagihans->where('status_pembayaran', $status)->values();
-            });
+            ->get();
 
-        return response()->json([
-            'message' => 'Daftar tagihan berhasil diambil.',
-            'data' => $tagihans,
-        ]);
+        $aktif = $tagihans
+            ->whereIn('status_pembayaran', ['belum_bayar', 'menunggu_verifikasi', 'ditolak'])
+            ->sortBy('bulan_tagihan')
+            ->values();
+
+        $riwayatSemua = $tagihans
+            ->where('status_pembayaran', 'lunas')
+            ->values();
+
+        $page = $request->query('page', 1);
+        $perPage = 5;
+        $riwayat = new LengthAwarePaginator(
+            $riwayatSemua->forPage($page, $perPage),
+            $riwayatSemua->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('Penghuni.tagihan.Tagihan', compact('aktif', 'riwayat'));
     }
 
     /**

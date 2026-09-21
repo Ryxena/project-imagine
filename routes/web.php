@@ -84,7 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:super_admin'])
 
 Route::prefix('penghuni')->name('penghuni.')->middleware(['auth', 'role:user'])->group(function () {
     // dashboard route buat landingpage penghuni
-    // Route::get('/', [PenghuniDashboardController::class, 'index'])->name('dashboard');
+    Route::get('/', [PenghuniDashboardController::class, 'index'])->name('dashboard');
 
     // profile
     Route::get('profile', [PenghuniProfileController::class, 'show'])->name('profile.show');

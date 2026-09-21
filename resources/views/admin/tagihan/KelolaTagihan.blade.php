@@ -78,6 +78,7 @@
         @forelse ($tagihans as $t)
             @php
                 $nama = $t->penghunian->user->name ?? '-';
+                $image = $t->penghunian->user->image ?? null; // Ambil data foto profil
                 $kamar = $t->penghunian->kamar->nomor_kamar ?? '-';
                 $bulanLabel = \Carbon\Carbon::createFromFormat('Y-m', $t->bulan_tagihan)->translatedFormat('M Y');
                 [$badgeClass, $badgeLabel] = match ($t->status_pembayaran) {
@@ -89,10 +90,17 @@
             @endphp
             <div class="tagihan-row flex items-center gap-4 px-5 py-3.5 hover:bg-cream-50 transition-colors duration-150"
                 data-status="{{ $t->status_pembayaran }}" data-bulan="{{ $t->bulan_tagihan }}">
-                <div
-                    class="w-9 h-9 rounded-full bg-sage-200 text-sage-800 text-xs font-semibold flex items-center justify-center shrink-0">
-                    {{ strtoupper(substr($nama, 0, 1)) }}
-                </div>
+
+                @if ($image)
+                    <img src="{{ asset('storage/' . $image) }}" alt="Foto {{ $nama }}"
+                        class="w-9 h-9 rounded-full object-cover shrink-0 border border-sage-200 shadow-sm">
+                @else
+                    <div
+                        class="w-9 h-9 rounded-full bg-sage-200 text-sage-800 text-xs font-semibold flex items-center justify-center shrink-0">
+                        {{ strtoupper(substr($nama, 0, 1)) }}
+                    </div>
+                @endif
+
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium text-cream-900 truncate">{{ $nama }}</p>
                     <p class="text-[11px] text-cream-600">Kamar {{ $kamar }} &bull; {{ $bulanLabel }}</p>
@@ -107,7 +115,7 @@
             </div>
         @endforelse
 
-        {{-- Empty state --}}
+
         <div id="filter-empty-state" class="hidden px-5 py-10 text-center">
             <div class="mx-auto w-10 h-10 rounded-full bg-cream-100 text-cream-500 flex items-center justify-center">
                 @include('partial.icons.receipt', ['class' => 'w-5 h-5'])

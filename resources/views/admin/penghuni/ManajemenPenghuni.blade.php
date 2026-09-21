@@ -52,13 +52,18 @@
                     data-email="{{ $p->email }}" data-no-hp="{{ $p->no_hp }}" data-status="{{ $p->status }}"
                     data-nomor-kamar="{{ $p->nomor_kamar ?? '' }}" data-tipe-kamar="{{ $p->tipe_kamar ?? '' }}"
                     data-harga="{{ $p->harga ?? '' }}" data-tanggal-masuk="{{ $p->tanggal_masuk ?? '' }}"
-                    data-kamar-id="{{ $p->kamar_id ?? '' }}">
+                    data-kamar-id="{{ $p->kamar_id ?? '' }}" data-image="{{ $p->image ?? '' }}">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div
-                                class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
-                                {{ strtoupper(substr($p->name, 0, 1)) }}
-                            </div>
+                            @if ($p->image)
+                                <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
+                                    class="w-10 h-10 rounded-full object-cover border border-sage-200 shrink-0 shadow-sm">
+                            @else
+                                <div
+                                    class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
+                                    {{ strtoupper(substr($p->name, 0, 1)) }}
+                                </div>
+                            @endif
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-cream-900 truncate">{{ $p->name }}</p>
                                 <p class="text-[11px] text-cream-600">
@@ -125,10 +130,15 @@
                     data-name="{{ strtolower($p->name) }}">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-3 min-w-0">
-                            <div
-                                class="w-10 h-10 rounded-full bg-cream-200 text-cream-600 text-sm font-semibold flex items-center justify-center shrink-0">
-                                {{ strtoupper(substr($p->name, 0, 1)) }}
-                            </div>
+                            @if ($p->image)
+                                <img src="{{ asset('storage/' . $p->image) }}" alt="Foto {{ $p->name }}"
+                                    class="w-10 h-10 rounded-full object-cover border border-sage-200 shrink-0 shadow-sm">
+                            @else
+                                <div
+                                    class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0">
+                                    {{ strtoupper(substr($p->name, 0, 1)) }}
+                                </div>
+                            @endif
                             <div class="min-w-0">
                                 <p class="text-sm font-semibold text-cream-900 truncate">{{ $p->name }}</p>
                                 <p class="text-[11px] text-cream-600">Terakhir di Kamar {{ $p->nomor_kamar ?? '-' }}</p>
@@ -165,7 +175,6 @@
         @endif
     </div>
 
-    {{-- Modal: Tambah Penghuni --}}
     <div id="modal-tambah-penghuni" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-md animate-in">
@@ -198,8 +207,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-medium text-cream-700 mb-1.5">Password Sementara</label>
-                    <input type="password" name="password" required minlength="8"
-                        placeholder="Minimal 8 karakter"
+                    <input type="password" name="password" required minlength="8" placeholder="Minimal 8 karakter"
                         class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-cream-300 bg-cream-50 focus:outline-none focus:ring-2 focus:ring-sage-400 focus:border-sage-400 transition-colors duration-150">
                 </div>
                 <p id="tambah-error" class="hidden text-xs text-terracotta-600"></p>
@@ -215,7 +223,6 @@
         </div>
     </div>
 
-    {{-- Modal: Detail Penghuni --}}
     <div id="modal-detail" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeDetailModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-md animate-in">
@@ -275,7 +282,6 @@
         </div>
     </div>
 
-    {{-- Modal: Edit Penghuni --}}
     <div id="modal-edit" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeEditModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-md animate-in">
@@ -319,7 +325,6 @@
         </div>
     </div>
 
-    {{-- Modal: Assign ke Kamar --}}
     <div id="modal-assign" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeAssignModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-md animate-in">
@@ -359,7 +364,6 @@
         </div>
     </div>
 
-    {{-- Modal: Checkout --}}
     <div id="modal-checkout" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="absolute inset-0 bg-cream-900/40" onclick="closeCheckoutModal()"></div>
         <div class="relative bg-white rounded-2xl shadow-lg w-full max-w-sm animate-in">
@@ -635,10 +639,24 @@
             const d = cardEl.dataset;
             currentDetail = d;
 
-            document.getElementById('detail-avatar').textContent = d.fullName.charAt(0).toUpperCase();
+            const avatarContainer = document.getElementById('detail-avatar');
+
+            // Sinkronisasi Foto Profil di Modal Detail
+            if (d.image && d.image.trim() !== '') {
+                avatarContainer.innerHTML =
+                    `<img src="/storage/${d.image}" alt="Foto ${d.fullName}" class="w-full h-full rounded-full object-cover">`;
+                avatarContainer.className =
+                    "w-12 h-12 rounded-full overflow-hidden border border-sage-200 shrink-0 shadow-sm flex items-center justify-center";
+            } else {
+                avatarContainer.textContent = d.fullName.charAt(0).toUpperCase();
+                avatarContainer.className =
+                    "w-12 h-12 rounded-full bg-sage-200 text-sage-800 text-base font-semibold flex items-center justify-center shrink-0";
+            }
+
             document.getElementById('detail-nama').textContent = d.fullName;
             document.getElementById('detail-status').textContent = 'Aktif';
-            document.getElementById('detail-kamar').textContent = `${d.nomorKamar} · ${d.tipeKamar}`;
+            document.getElementById('detail-kamar').textContent = d.nomorKamar ? `${d.nomorKamar} · ${d.tipeKamar}` :
+                'Belum ditempatkan';
             document.getElementById('detail-harga').textContent = d.harga ?
                 'Rp' + Number(d.harga).toLocaleString('id-ID') + ' / bulan' :
                 '-';

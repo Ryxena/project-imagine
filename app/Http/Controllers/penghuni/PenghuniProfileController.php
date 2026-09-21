@@ -12,7 +12,7 @@ use Illuminate\Validation\Rule;
 
 class PenghuniProfileController extends Controller
 {
-     /**
+    /**
      * Menampilkan profile penghuni yang sedang login.
      */
     public function show(Request $request)
@@ -20,29 +20,11 @@ class PenghuniProfileController extends Controller
         $user = $request->user();
 
         $penghunian = Penghunian::where('user_id', $user->id)
-            ->with([
-                'kamar',
-                // 'lastKamar',
-            ])
+            ->with('kamar')
             ->latest()
             ->first();
 
-        return response()->json([
-            'message' => 'Profile berhasil diambil.',
-            'data' => [
-                'profile' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'no_hp' => $user->no_hp,
-                    'image' => $user->image,
-                    'role' => $user->role,
-                    'status' => $user->status,
-                ],
-
-                'penghunian' => $penghunian,
-            ],
-        ]);
+        return view('Penghuni.Profil', compact('user', 'penghunian'));
     }
 
     /**
@@ -116,7 +98,7 @@ class PenghuniProfileController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $validated['password'] = Hash::make(
                 $validated['password']
             );

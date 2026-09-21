@@ -9,21 +9,27 @@ use Illuminate\Support\Facades\Storage;
 
 class PenghuniKeluhanController extends Controller
 {
-        /**
+    /**
      * Menampilkan daftar keluhan milik user yang sedang login.
      */
     public function index(Request $request)
     {
-        $keluhans = Keluhan::where('user_id', $request->user()->id)
+        $userId = $request->user()->id;
+
+        $countPending = Keluhan::where('user_id', $userId)->where('status', 'pending')->count();
+        $countProcess = Keluhan::where('user_id', $userId)->where('status', 'process')->count();
+        $countResolved = Keluhan::where('user_id', $userId)->where('status', 'resolved')->count();
+
+        $keluhans = Keluhan::where('user_id', $userId)
             ->latest()
-            ->get();
+            ->paginate(5);
 
-        return response()->json([
-            'message' => 'Daftar keluhan berhasil diambil.',
-            'data' => $keluhans,
-        ]);
-
-        // return view('penghuni.keluhan', compact('keluhans'));
+        return view('Penghuni.keluhan.Keluhan', compact(
+            'keluhans',
+            'countPending',
+            'countProcess',
+            'countResolved'
+        ));
     }
 
     /**
@@ -32,10 +38,7 @@ class PenghuniKeluhanController extends Controller
      * Jika menggunakan Blade, method ini dapat digunakan
      * untuk menampilkan halaman/form membuat keluhan.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Menyimpan keluhan baru.

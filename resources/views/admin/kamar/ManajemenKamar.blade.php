@@ -38,6 +38,7 @@
             @php
                 $isTerisi = !is_null($k->penghuni_kamar_id);
             @endphp
+
             <div data-status="{{ $isTerisi ? 'terisi' : 'kosong' }}"
                 class="kamar-card bg-white rounded-xl p-4 shadow-sm border border-cream-200 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ease-out">
                 <div class="flex items-start justify-between">
@@ -66,10 +67,15 @@
                 <div class="mt-3 pt-3 border-t border-cream-100 flex items-center justify-between">
                     @if ($isTerisi)
                         <div class="flex items-center gap-2 min-w-0">
-                            <div
-                                class="w-6 h-6 rounded-full bg-sage-200 text-sage-800 text-[10px] font-semibold flex items-center justify-center shrink-0">
-                                {{ strtoupper(substr($k->name ?? '?', 0, 1)) }}
-                            </div>
+                            @if (!empty($k->image))
+                                <img src="{{ asset('storage/' . $k->image) }}" alt="Foto {{ $k->name }}"
+                                    class="w-6 h-6 rounded-full object-cover shrink-0 border border-sage-300 shadow-sm">
+                            @else
+                                <div
+                                    class="w-6 h-6 rounded-full bg-sage-200 text-sage-800 text-[10px] font-semibold flex items-center justify-center shrink-0">
+                                    {{ strtoupper(substr($k->name ?? '?', 0, 1)) }}
+                                </div>
+                            @endif
                             <p class="text-xs text-cream-900 truncate">{{ $k->name }}</p>
                         </div>
                         <span
