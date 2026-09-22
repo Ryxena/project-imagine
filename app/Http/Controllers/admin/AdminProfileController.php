@@ -30,19 +30,13 @@ class AdminProfileController extends Controller
 
         $validated = $request->validate([
             'name' => ['sometimes', 'required', 'string', 'max:255'],
-
             'email' => [
-                'sometimes',
-                'required',
-                'email',
-                'max:255',
+                'sometimes', 'required', 'email', 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
-
             'no_hp' => ['sometimes', 'required', 'string', 'max:255'],
-
+            'current_password' => ['required_with:password', 'current_password'],
             'password' => ['sometimes', 'nullable', 'string', 'min:8', 'confirmed'],
-
             'image' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
@@ -50,9 +44,7 @@ class AdminProfileController extends Controller
             if ($user->image) {
                 Storage::disk('public')->delete($user->image);
             }
-
-            $validated['image'] = $request->file('image')
-                ->store('user/profile', 'public');
+            $validated['image'] = $request->file('image')->store('user/profile', 'public');
         }
 
         if (! empty($validated['password'])) {
@@ -60,6 +52,8 @@ class AdminProfileController extends Controller
         } else {
             unset($validated['password']);
         }
+
+        unset($validated['current_password']);
 
         $user->update($validated);
 

@@ -1,3 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="{{ $class ?? 'w-5 h-5' }}">
-    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-1.5c0-1.657 1.343-3 3-3H21m-9-3.75h.008v.008H12v-.008ZM3 21V4.5A2.25 2.25 0 0 1 5.25 2.25h4.5A2.25 2.25 0 0 1 12 4.5v4.5m-9 12h9m-9 0v-5.25m9-11.25h4.5A2.25 2.25 0 0 1 21 6v14.25m-9-16.5v5.25m0 0h4.5m-4.5 0v11.25m0-11.25H3.75" />
+    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0110.5 3h6a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0116.5 20.25h-6A2.25 2.25 0 018.25 18V9zM8.25 9H6.75A2.25 2.25 0 004.5 11.25v6.75A2.25 2.25 0 006.75 20.25h1.5v-11.25zm9.75 3h.008v.008H18V12z" />
 </svg>

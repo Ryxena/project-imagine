@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use App\Models\Pengumuman;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ManajemenPengumumanController extends Controller
 {
@@ -36,11 +39,23 @@ class ManajemenPengumumanController extends Controller
             'tanggal_publish' => $validated['tanggal_publish'],
         ]);
 
+        $penghunis = User::where('role', 'user')->get();
+
+        foreach ($penghunis as $penghuni) {
+            Notification::create([
+                'user_id' => $penghuni->id,
+                'judul' => 'Pengumuman Baru: '.$pengumuman->judul,
+                'pesan' => Str::limit($pengumuman->deskripsi, 80),
+                'tipe' => 'pengumuman',
+                'dibaca' => false,
+            ]);
+        }
+
         $pengumuman->load('admin:id,name');
 
         return response()->json([
             'success' => true,
-            'message' => 'Pengumuman berhasil dibuat',
+            'message' => 'Pengumuman berhasil dibuat dan notifikasi dikirim.',
             'data' => $pengumuman,
         ], 201);
     }
@@ -66,11 +81,23 @@ class ManajemenPengumumanController extends Controller
 
         $pengumuman->update($validated);
 
+        $penghunis = User::where('role', 'user')->get();
+
+        foreach ($penghunis as $penghuni) {
+            Notification::create([
+                'user_id' => $penghuni->id,
+                'judul' => 'Pengumuman Diperbarui: '.$pengumuman->judul,
+                'pesan' => 'Ada pembaruan informasi pada pengumuman ini.',
+                'tipe' => 'pengumuman',
+                'dibaca' => false,
+            ]);
+        }
+
         $pengumuman->load('admin:id,name');
 
         return response()->json([
             'success' => true,
-            'message' => 'Pengumuman berhasil diperbarui',
+            'message' => 'Pengumuman berhasil diperbarui dan notifikasi dikirim.',
             'data' => $pengumuman,
         ]);
     }

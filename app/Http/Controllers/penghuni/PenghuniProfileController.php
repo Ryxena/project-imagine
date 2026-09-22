@@ -35,86 +35,31 @@ class PenghuniProfileController extends Controller
         $user = $request->user();
 
         $validated = $request->validate([
-            'name' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:255',
-            ],
-
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
             'email' => [
-                'sometimes',
-                'required',
-                'email',
-                'max:255',
+                'sometimes', 'required', 'email', 'max:255',
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
-
-            'no_hp' => [
-                'sometimes',
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'password' => [
-                'sometimes',
-                'nullable',
-                'string',
-                'min:8',
-                'confirmed',
-            ],
-
-            'image' => [
-                'sometimes',
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png,webp',
-                'max:2048',
-            ],
+            'no_hp' => ['sometimes', 'required', 'string', 'max:255'],
+            'current_password' => ['required_with:password', 'current_password'],
+            'password' => ['sometimes', 'nullable', 'string', 'min:8', 'confirmed'],
+            'image' => ['sometimes', 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update Image
-        |--------------------------------------------------------------------------
-        */
-
         if ($request->hasFile('image')) {
-
-            // Hapus image lama
             if ($user->image) {
                 Storage::disk('public')->delete($user->image);
             }
-
-            // Simpan image baru
-            $validated['image'] = $request->file('image')
-                ->store('user/profile', 'public');
+            $validated['image'] = $request->file('image')->store('user/profile', 'public');
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update Password
-        |--------------------------------------------------------------------------
-        */
-
         if (! empty($validated['password'])) {
-            $validated['password'] = Hash::make(
-                $validated['password']
-            );
+            $validated['password'] = Hash::make($validated['password']);
         } else {
             unset($validated['password']);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Update User
-        |--------------------------------------------------------------------------
-        |
-        | role dan status tidak ada di $validated,
-        | sehingga tidak dapat diubah melalui endpoint ini.
-        |
-        */
+        unset($validated['current_password']);
 
         $user->update($validated);
 

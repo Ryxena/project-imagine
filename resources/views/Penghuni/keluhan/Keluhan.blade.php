@@ -4,10 +4,23 @@
 @section('page-subtitle', 'Sampaikan kendala yang kamu alami.')
 
 @section('content')
-    <button onclick="openCreateModal()"
-        class="flex items-center gap-2 bg-sage-700 text-white text-xs font-medium px-4 py-2.5 rounded-full hover:bg-sage-800 hover:shadow-md active:scale-[0.98] transition-all duration-150 ease-out animate-in">
-        + Buat Keluhan Baru
-    </button>
+    @include('partial.tenant-status-banner')
+
+    @php
+        $isCanCreate = !in_array($tenantStatus, ['unassigned', 'no_record', 'checked_out']);
+    @endphp
+
+    @if ($isCanCreate)
+        <button onclick="openCreateModal()"
+            class="flex items-center gap-2 bg-sage-700 text-white text-xs font-medium px-4 py-2.5 rounded-full hover:bg-sage-800 hover:shadow-md active:scale-[0.98] transition-all duration-150 ease-out animate-in">
+            + Buat Keluhan Baru
+        </button>
+    @else
+        <button disabled
+            class="flex items-center gap-2 bg-cream-200/60 text-cream-600 text-xs font-medium px-4 py-2.5 rounded-full cursor-not-allowed border border-cream-200/50 opacity-60 animate-in">
+            + Buat Keluhan Baru
+        </button>
+    @endif
 
     <div class="mt-5 grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4 items-start animate-in" style="animation-delay: 0.05s">
         <div class="space-y-4">
@@ -89,39 +102,87 @@
                         };
                         $kamar = $k->user->penghunian->first()?->kamar?->nomor_kamar ?? null;
                     @endphp
-                    <div class="bg-white rounded-xl border border-cream-200 shadow-sm p-4">
-                        <div class="flex items-start justify-between gap-3">
+
+                    <div class="bg-white rounded-xl border border-cream-200 shadow-sm p-4 sm:p-5">
+                        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+
                             <div class="flex items-start gap-3 min-w-0">
                                 <div
-                                    class="w-9 h-9 rounded-lg {{ $iconTint }} flex items-center justify-center shrink-0">
+                                    class="w-9 h-9 rounded-lg {{ $iconTint }} flex items-center justify-center shrink-0 mt-0.5">
                                     @include('partial.icons.' . $iconName, ['class' => 'w-4 h-4'])
                                 </div>
                                 <div class="min-w-0">
-                                    <p class="text-sm font-semibold text-cream-900">{{ $k->judul }}</p>
+                                    <p class="text-sm font-semibold text-cream-900 leading-snug">{{ $k->judul }}</p>
                                     <p class="text-[11px] text-cream-500 mt-0.5 flex items-center gap-1">
-                                        <span class="inline-block w-1 h-3 bg-cream-300 rounded-full"></span>
+                                        <span class="inline-block w-1 h-3 bg-cream-300 rounded-full shrink-0"></span>
                                         {{ $kamar ? 'Kamar ' . $kamar : 'Umum' }} &bull;
                                         {{ $k->created_at->translatedFormat('d M Y') }}
                                     </p>
                                 </div>
                             </div>
-                            <span
-                                class="shrink-0 {{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
+                            <div
+                                class="flex items-center justify-between sm:justify-end gap-2 shrink-0 pt-2 sm:pt-0 border-t sm:border-0 border-cream-100">
+                                <span
+                                    class="{{ $badgeClass }} text-[10px] font-semibold px-2.5 py-1 rounded-full">{{ $badgeLabel }}</span>
+
+                                @if ($k->status === 'pending' && $isCanCreate)
+                                    <div class="flex items-center gap-1 border-l border-cream-200 pl-2 ml-1">
+                                        <button onclick="openEditModal({{ $k->id }})" title="Edit Keluhan"
+                                            class="w-7 h-7 rounded-lg text-cream-400 hover:text-sage-700 hover:bg-sage-50 flex items-center justify-center transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                            </svg>
+                                        </button>
+                                        <button
+                                            onclick="openDeleteModal({{ $k->id }}, '{{ addslashes($k->judul) }}')"
+                                            title="Hapus Keluhan"
+                                            class="w-7 h-7 rounded-lg text-cream-400 hover:text-terracotta-600 hover:bg-terracotta-50 flex items-center justify-center transition-colors">
+                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round"
+                                                    d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
-                        <div class="mt-3 pl-12">
+                        <div class="mt-3 pl-0 sm:pl-12">
                             <p class="text-xs text-cream-600 leading-relaxed">{{ $k->deskripsi }}</p>
 
                             @if ($k->image)
                                 <img src="{{ asset('storage/' . $k->image) }}" alt="Lampiran keluhan"
-                                    class="mt-3 rounded-lg border border-cream-200 max-h-48 object-cover cursor-pointer"
+                                    class="mt-3 rounded-lg border border-cream-200 max-h-48 w-full sm:w-auto object-cover cursor-pointer shadow-2xs"
                                     onclick="window.open('{{ asset('storage/' . $k->image) }}', '_blank')">
                             @endif
                         </div>
                     </div>
                 @empty
-                    <div class="bg-white rounded-xl border border-cream-200 px-4 py-8 text-center shadow-sm">
-                        <p class="text-sm text-cream-600">Belum ada keluhan. Semua baik-baik saja!</p>
+                    <div class="bg-white rounded-xl border border-cream-200 px-6 py-10 text-center shadow-sm space-y-3">
+                        @if (in_array($tenantStatus, ['unassigned', 'no_record']))
+                            <div
+                                class="w-12 h-12 rounded-full bg-cream-100 text-cream-600 flex items-center justify-center mx-auto mb-1">
+                                @include('partial.icons.door', ['class' => 'w-6 h-6'])
+                            </div>
+                            <p class="text-sm font-bold text-cream-900">Belum Ada Riwayat Keluhan</p>
+                            <p class="text-xs text-cream-600 max-w-sm mx-auto leading-relaxed">
+                                Kamu bisa mulai menyampaikan kendala fasilitas setelah resmi mendapatkan penempatan kamar
+                                dari pengelola.
+                            </p>
+                        @else
+                            <div
+                                class="w-12 h-12 rounded-full bg-sage-100 text-sage-700 flex items-center justify-center mx-auto mb-1">
+                                @include('partial.icons.check', ['class' => 'w-6 h-6'])
+                            </div>
+                            <p class="text-sm font-bold text-cream-900">Semua Fasilitas Aman & Terkendali!</p>
+                            <p class="text-xs text-cream-600 max-w-sm mx-auto leading-relaxed">
+                                Ada kendala dengan fasilitas kamar atau lingkungan kos? Jangan ragu untuk sampaikan ke kami
+                                lewat tombol di atas ya.
+                            </p>
+                        @endif
                     </div>
                 @endforelse
             </div>
@@ -134,13 +195,13 @@
         </div>
     </div>
 
-    <div id="modal-create-keluhan" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-cream-900/40 backdrop-blur-sm transition-opacity" onclick="closeCreateModal()">
+    <div id="modal-form-keluhan" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-cream-900/40 backdrop-blur-sm transition-opacity" onclick="closeFormModal()">
         </div>
         <div class="relative bg-white rounded-2xl shadow-xl w-full max-w-md animate-in fade-in zoom-in-95 duration-200">
             <div class="flex items-center justify-between px-6 py-4 border-b border-cream-100">
-                <h3 class="text-base font-bold text-cream-900">Buat Keluhan Baru</h3>
-                <button onclick="closeCreateModal()"
+                <h3 id="modal-title-keluhan" class="text-base font-bold text-cream-900">Buat Keluhan Baru</h3>
+                <button onclick="closeFormModal()"
                     class="text-cream-400 hover:text-cream-900 transition-colors duration-150 p-1 rounded-full hover:bg-cream-50">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
                         stroke="currentColor" class="w-5 h-5">
@@ -149,17 +210,22 @@
                 </button>
             </div>
 
-            <form id="form-create-keluhan" class="px-6 py-5 space-y-4">
+            <form id="form-keluhan" class="px-6 py-5 space-y-4">
                 @csrf
+                <input type="hidden" name="id" id="keluhan-id">
+                <input type="hidden" name="_method" id="keluhan-method" value="POST">
+
                 <div>
                     <label class="block text-[13px] font-bold text-cream-800 mb-1.5">Judul Keluhan</label>
-                    <input type="text" name="judul" required placeholder="Contoh: AC Kamar Bocor"
+                    <input type="text" name="judul" id="keluhan-judul" required
+                        placeholder="Contoh: AC Kamar Bocor"
                         class="w-full text-[14px] px-4 py-2.5 rounded-xl border border-cream-300 bg-white placeholder:text-cream-400 focus:outline-none focus:ring-4 focus:ring-sage-500/10 focus:border-sage-500 transition-all duration-200">
                 </div>
 
                 <div>
                     <label class="block text-[13px] font-bold text-cream-800 mb-1.5">Deskripsi Detail</label>
-                    <textarea name="deskripsi" rows="4" required placeholder="Jelaskan detail kendala yang Anda alami..."
+                    <textarea name="deskripsi" id="keluhan-deskripsi" rows="4" required
+                        placeholder="Jelaskan detail kendala yang Anda alami..."
                         class="w-full text-[14px] px-4 py-2.5 rounded-xl border border-cream-300 bg-white placeholder:text-cream-400 focus:outline-none focus:ring-4 focus:ring-sage-500/10 focus:border-sage-500 transition-all duration-200 resize-none"></textarea>
                 </div>
 
@@ -206,17 +272,44 @@
                     </label>
                 </div>
 
-                <p id="create-keluhan-error"
+                <p id="form-keluhan-error"
                     class="hidden text-xs font-medium text-terracotta-600 bg-terracotta-50 p-2 rounded-lg"></p>
             </form>
 
             <div
                 class="flex items-center justify-end gap-3 px-6 py-4 border-t border-cream-100 bg-cream-50/50 rounded-b-2xl">
-                <button onclick="closeCreateModal()"
+                <button onclick="closeFormModal()"
                     class="text-[14px] font-semibold text-cream-600 hover:text-cream-900 px-4 py-2 transition-colors duration-150">Batal</button>
-                <button onclick="submitCreateKeluhan()"
+                <button onclick="submitFormKeluhan()" id="btn-submit-keluhan"
                     class="bg-sage-700 text-white text-[14px] font-semibold px-5 py-2.5 rounded-full hover:bg-sage-800 shadow-md shadow-sage-700/20 active:scale-[0.98] transition-all duration-200 ease-out">Kirim
                     Keluhan</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-delete-keluhan" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-cream-900/40 backdrop-blur-sm transition-opacity" onclick="closeDeleteModal()">
+        </div>
+        <div
+            class="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 text-center animate-in fade-in zoom-in-95 duration-200">
+            <div
+                class="w-12 h-12 rounded-full bg-terracotta-100 text-terracotta-600 flex items-center justify-center mx-auto mb-4">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
+            </div>
+            <h3 class="text-base font-bold text-cream-900">Batalkan Keluhan?</h3>
+            <p id="delete-keluhan-message" class="text-xs text-cream-600 mt-2 leading-relaxed"></p>
+            <input type="hidden" id="delete-keluhan-id">
+            <div class="mt-6 flex items-center gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 text-[13px] font-semibold text-cream-700 bg-cream-100 hover:bg-cream-200 py-2.5 rounded-xl transition-colors">Tidak,
+                    Kembali</button>
+                <button onclick="executeDeleteKeluhan()"
+                    class="flex-1 text-[13px] font-semibold text-white bg-terracotta-600 hover:bg-terracotta-700 py-2.5 rounded-xl transition-colors">Ya,
+                    Batalkan</button>
             </div>
         </div>
     </div>
@@ -224,15 +317,65 @@
 
 @push('scripts')
     <script>
+        const keluhanData = @json($keluhans->keyBy('id'));
+
         function openCreateModal() {
-            document.getElementById('modal-create-keluhan').classList.remove('hidden');
+            document.getElementById('modal-title-keluhan').textContent = 'Buat Keluhan Baru';
+            document.getElementById('btn-submit-keluhan').textContent = 'Kirim Keluhan';
+            document.getElementById('keluhan-id').value = '';
+            document.getElementById('keluhan-method').value = 'POST';
+
+            document.getElementById('form-keluhan').reset();
+            document.getElementById('form-keluhan-error').classList.add('hidden');
+
+            resetImagePreview();
+            document.getElementById('modal-form-keluhan').classList.remove('hidden');
         }
 
-        function closeCreateModal() {
-            document.getElementById('modal-create-keluhan').classList.add('hidden');
-            document.getElementById('form-create-keluhan').reset();
-            document.getElementById('create-keluhan-error').classList.add('hidden');
+        function openEditModal(id) {
+            const k = keluhanData[id];
 
+            document.getElementById('modal-title-keluhan').textContent = 'Edit Keluhan';
+            document.getElementById('btn-submit-keluhan').textContent = 'Simpan Perubahan';
+            document.getElementById('keluhan-id').value = k.id;
+            document.getElementById('keluhan-method').value = 'PUT';
+
+            document.getElementById('keluhan-judul').value = k.judul;
+            document.getElementById('keluhan-deskripsi').value = k.deskripsi;
+
+            document.getElementById('form-keluhan-error').classList.add('hidden');
+            resetImagePreview();
+
+            if (k.image) {
+                const placeholder = document.getElementById('upload-placeholder');
+                const previewContainer = document.getElementById('file-preview-container');
+                const nameDisplay = document.getElementById('file-name-display');
+
+                nameDisplay.textContent = "(Terdapat foto tersimpan)";
+                placeholder.classList.add('hidden');
+                previewContainer.classList.remove('hidden');
+                previewContainer.classList.add('flex');
+            }
+
+            document.getElementById('modal-form-keluhan').classList.remove('hidden');
+        }
+
+        function closeFormModal() {
+            document.getElementById('modal-form-keluhan').classList.add('hidden');
+        }
+
+        function openDeleteModal(id, judul) {
+            document.getElementById('delete-keluhan-id').value = id;
+            document.getElementById('delete-keluhan-message').innerHTML =
+                `Keluhan <strong>"${judul}"</strong> akan dihapus dan dibatalkan secara permanen.`;
+            document.getElementById('modal-delete-keluhan').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('modal-delete-keluhan').classList.add('hidden');
+        }
+
+        function resetImagePreview() {
             const placeholder = document.getElementById('upload-placeholder');
             const previewContainer = document.getElementById('file-preview-container');
             if (placeholder && previewContainer) {
@@ -242,12 +385,13 @@
             }
         }
 
-        async function submitCreateKeluhan() {
-            const form = document.getElementById('form-create-keluhan');
-            const errorEl = document.getElementById('create-keluhan-error');
+        async function submitFormKeluhan() {
+            const form = document.getElementById('form-keluhan');
+            const errorEl = document.getElementById('form-keluhan-error');
             errorEl.classList.add('hidden');
 
             const formData = new FormData(form);
+            const id = document.getElementById('keluhan-id').value;
 
             if (!formData.get('judul') || !formData.get('deskripsi')) {
                 errorEl.textContent = 'Judul dan deskripsi wajib diisi.';
@@ -255,8 +399,13 @@
                 return;
             }
 
+            let url = '{{ route('penghuni.keluhan.store') }}';
+            if (id) {
+                url = `/penghuni/keluhan/${id}`;
+            }
+
             try {
-                const res = await fetch('{{ route('penghuni.keluhan.store') }}', {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -267,7 +416,7 @@
                 const json = await res.json();
 
                 if (!res.ok) {
-                    errorEl.textContent = json.message || 'Gagal membuat keluhan.';
+                    errorEl.textContent = json.message || 'Gagal menyimpan keluhan.';
                     errorEl.classList.remove('hidden');
                     return;
                 }
@@ -276,6 +425,30 @@
             } catch (err) {
                 errorEl.textContent = 'Terjadi kesalahan jaringan.';
                 errorEl.classList.remove('hidden');
+            }
+        }
+
+        async function executeDeleteKeluhan() {
+            const id = document.getElementById('delete-keluhan-id').value;
+
+            try {
+                const res = await fetch(`/penghuni/keluhan/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    }
+                });
+                const json = await res.json();
+
+                if (!res.ok) {
+                    alert(json.message || 'Gagal menghapus keluhan.');
+                    return;
+                }
+
+                window.location.reload();
+            } catch (err) {
+                alert('Terjadi kesalahan jaringan.');
             }
         }
 
@@ -292,9 +465,7 @@
                 previewContainer.classList.remove('hidden');
                 previewContainer.classList.add('flex');
             } else {
-                placeholder.classList.remove('hidden');
-                previewContainer.classList.add('hidden');
-                previewContainer.classList.remove('flex');
+                resetImagePreview();
             }
         }
     </script>

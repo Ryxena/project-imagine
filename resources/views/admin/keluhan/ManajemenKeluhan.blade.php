@@ -10,21 +10,28 @@
         $countSelesai = $keluhans->where('status', 'resolved')->count();
     @endphp
 
-    <div class="flex gap-2 animate-in">
+    <div class="flex gap-2 overflow-x-auto pb-1 sm:pb-0 whitespace-nowrap animate-in no-scrollbar"
+        style="-ms-overflow-style: none; scrollbar-width: none;">
+        <style>
+            .no-scrollbar::-webkit-scrollbar {
+                display: none;
+            }
+        </style>
+
         <button data-filter="semua" onclick="filterKeluhan('semua')"
-            class="filter-tab bg-sage-700 text-white text-xs font-medium px-3.5 py-1.5 rounded-full transition-all duration-150 ease-out">
+            class="filter-tab shrink-0 bg-sage-700 text-white text-xs font-medium px-4 py-2 rounded-full transition-all duration-150 ease-out">
             Semua ({{ $keluhans->count() }})
         </button>
         <button data-filter="pending" onclick="filterKeluhan('pending')"
-            class="filter-tab bg-cream-200 text-cream-600 text-xs font-medium px-3.5 py-1.5 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
+            class="filter-tab shrink-0 bg-cream-200 text-cream-600 text-xs font-medium px-4 py-2 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
             Baru ({{ $countBaru }})
         </button>
         <button data-filter="process" onclick="filterKeluhan('process')"
-            class="filter-tab bg-cream-200 text-cream-600 text-xs font-medium px-3.5 py-1.5 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
+            class="filter-tab shrink-0 bg-cream-200 text-cream-600 text-xs font-medium px-4 py-2 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
             Diproses ({{ $countProses }})
         </button>
         <button data-filter="resolved" onclick="filterKeluhan('resolved')"
-            class="filter-tab bg-cream-200 text-cream-600 text-xs font-medium px-3.5 py-1.5 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
+            class="filter-tab shrink-0 bg-cream-200 text-cream-600 text-xs font-medium px-4 py-2 rounded-full hover:bg-cream-200 transition-all duration-150 ease-out">
             Selesai ({{ $countSelesai }})
         </button>
     </div>
@@ -70,7 +77,7 @@
                 </div>
 
                 <div class="mt-3 pt-3 border-t border-cream-100 flex items-center justify-between">
-                    <p class="text-[11px] text-cream-500">{{ $k->created_at->translatedFormat('d M Y') }}</p>
+                    <p class="text-[11px] text-cream-500">{{ $k->created_at->translatedFormat('d M Y, H:i') }} WIB</p>
                     <div class="flex items-center gap-2">
                         <button onclick="openDetailKeluhan({{ $k->id }})"
                             class="text-cream-500 hover:text-cream-800 transition-colors duration-150">
@@ -137,14 +144,17 @@
             </div>
 
             <div class="px-6 py-5">
-                <div class="flex items-center gap-3">
-                    <div id="dk-avatar"
-                        class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0 overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div id="dk-avatar"
+                            class="w-10 h-10 rounded-full bg-sage-200 text-sage-800 text-sm font-semibold flex items-center justify-center shrink-0 overflow-hidden">
+                        </div>
+                        <div>
+                            <p id="dk-nama" class="text-sm font-semibold text-cream-900"></p>
+                            <p id="dk-kamar" class="text-[11px] text-cream-600"></p>
+                        </div>
                     </div>
-                    <div>
-                        <p id="dk-nama" class="text-sm font-semibold text-cream-900"></p>
-                        <p id="dk-kamar" class="text-[11px] text-cream-600"></p>
-                    </div>
+                    <p id="dk-waktu" class="text-[11px] text-cream-500 font-medium"></p>
                 </div>
 
                 <div class="mt-4 flex items-center justify-between">
@@ -168,7 +178,7 @@
 
 @push('scripts')
     <script>
-        const keluhanData = @json($keluhans->load('user')->keyBy('id'));
+        const keluhanData = @json($keluhans->load('user.penghunian.kamar')->keyBy('id'));
         let currentKeluhanId = null;
         let activeFilter = 'semua';
         let keluhanPage = 1;
@@ -242,7 +252,6 @@
 
             let html = '';
 
-            // Tombol Previous
             const prevDisabled = keluhanPage === 1;
             html += `
                 <button onclick="changeKeluhanPage(-1)" ${prevDisabled ? 'disabled' : ''}
@@ -257,7 +266,6 @@
                 </button>
             `;
 
-            // Tombol Nomor Halaman
             for (let i = 1; i <= totalPages; i++) {
                 if (i === keluhanPage) {
                     html += `
@@ -275,7 +283,6 @@
                 }
             }
 
-            // Tombol Next
             const nextDisabled = keluhanPage === totalPages;
             html += `
                 <button onclick="changeKeluhanPage(1)" ${nextDisabled ? 'disabled' : ''}
@@ -328,6 +335,7 @@
             const k = keluhanData[id];
             const nama = k.user?.name ?? '-';
             const image = k.user?.image ?? null;
+
             const kamar = k.user?.penghunian?.[0]?.kamar?.nomor_kamar ?? '-';
             const meta = statusMeta[k.status];
 
@@ -346,6 +354,17 @@
 
             document.getElementById('dk-nama').textContent = nama;
             document.getElementById('dk-kamar').textContent = `Kamar ${kamar}`;
+
+            const createdAt = new Date(k.created_at);
+            const options = {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('dk-waktu').textContent = createdAt.toLocaleDateString('id-ID', options) + ' WIB';
+
             document.getElementById('dk-judul').textContent = k.judul;
             document.getElementById('dk-deskripsi').textContent = k.deskripsi;
 

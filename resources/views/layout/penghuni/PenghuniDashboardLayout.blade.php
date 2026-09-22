@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="manifest" href="{{ asset('site.webmanifest') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <title>@yield('title', 'NgekostYuk') | Penghuni</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -82,6 +88,17 @@
                 </div>
             </header>
             <main class="flex-1 px-4 pt-20 pb-8 lg:px-8 lg:pt-0 @yield('main-bg')">
+                <div class="block lg:hidden mb-6 pt-2">
+                    <h1 class="text-xl font-bold text-cream-900">
+                        @yield('page-title', 'Dashboard')
+                    </h1>
+                    @hasSection('page-subtitle')
+                        <p class="mt-1 text-xs text-cream-600 leading-relaxed">
+                            @yield('page-subtitle')
+                        </p>
+                    @endif
+                </div>
+
                 @yield('content')
             </main>
         </div>
@@ -115,6 +132,10 @@
             `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>`;
         const svgBell =
             `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" /></svg>`;
+        const svgMegaphone =
+            `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 01-4.5-4.5V9.75A4.5 4.5 0 017.5 5.25h.75c.704 0 1.402-.03 2.09-.09m0 10.68l3.47 2.31a.75.75 0 001.19-.62V3.62a.75.75 0 00-1.19-.62l-3.47 2.31m0 10.68v-10.68" /></svg>`;
+        const svgChat =
+            `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" /></svg>`;
 
         const notifTypeMeta = {
             tagihan: {
@@ -127,7 +148,18 @@
                 tint: 'bg-sage-100 text-sage-700',
                 route: "{{ route('penghuni.tagihan.index') }}"
             },
+            pengumuman: {
+                rawSvg: svgMegaphone,
+                tint: 'bg-sage-100 text-sage-700',
+                route: "{{ route('penghuni.pengumuman.index') }}"
+            },
+            keluhan: {
+                rawSvg: svgChat,
+                tint: 'bg-amber-100 text-amber-700',
+                route: "{{ route('penghuni.keluhan.index') }}"
+            }
         };
+
         const notifFallback = {
             rawSvg: svgBell,
             tint: 'bg-cream-100 text-cream-600',
@@ -278,13 +310,11 @@
 
             const items = notifications.map(n => {
                 const meta = notifTypeMeta[n.tipe] || notifFallback;
-                const unreadDot = !n.dibaca ?
-                    `<span class="w-2 h-2 bg-sage-600 rounded-full shrink-0 mt-1.5"></span>` :
-                    `<span class="w-2 h-2 shrink-0"></span>`;
+
                 return `
                     <button onclick="handleNotifClick(${n.id}, ${meta.route ? `'${meta.route}'` : 'null'})"
-                        class="w-full flex items-start gap-3 px-4 py-3 hover:bg-cream-50 transition-colors duration-150 text-left ${!n.dibaca ? 'bg-sage-50/50' : ''}">
-                        ${unreadDot}
+                        class="w-full flex items-start gap-3 px-4 py-3 hover:bg-sage-50/80 transition-colors duration-150 text-left bg-sage-50/40">
+                        <span class="w-2 h-2 bg-sage-600 rounded-full shrink-0 mt-1.5"></span>
                         <div class="min-w-0 flex-1">
                             <p class="text-xs font-semibold text-cream-900">${n.judul}</p>
                             <p class="text-[11px] text-cream-600 mt-0.5 leading-relaxed">${n.pesan}</p>
@@ -294,7 +324,14 @@
                 `;
             }).join('');
 
-            panel.innerHTML = header + `<div class="overflow-y-auto divide-y divide-cream-100">${items}</div>`;
+            const footer = notifications.length >= 30 ? `
+                <div class="px-4 py-2.5 border-t border-cream-200 bg-cream-50/50 text-center shrink-0">
+                    <p class="text-[10px] text-cream-500">Menampilkan 30 notifikasi terakhir</p>
+                </div>
+            ` : '';
+
+            panel.innerHTML = header + `<div class="overflow-y-auto divide-y divide-cream-100 flex-1">${items}</div>` +
+                footer;
         }
 
         async function handleNotifClick(id, redirectUrl) {

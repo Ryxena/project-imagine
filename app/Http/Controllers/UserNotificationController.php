@@ -14,15 +14,20 @@ class UserNotificationController extends Controller
      */
     public function index(Request $request)
     {
-        $notifications = Notification::query()
+        $query = Notification::query()
             ->where('user_id', $request->user()->id)
-            ->latest()
+            ->where('dibaca', false);
+
+        $unreadCount = $query->count();
+
+        $notifications = $query->latest()
+            ->take(30)
             ->get();
 
         return response()->json([
             'success' => true,
-            'message' => 'Daftar notifikasi berhasil diambil.',
-            'unread_count' => $notifications->where('dibaca', false)->count(),
+            'message' => 'Daftar notifikasi belum dibaca berhasil diambil.',
+            'unread_count' => $unreadCount,
             'data' => $notifications,
         ]);
     }

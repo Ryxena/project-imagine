@@ -33,52 +33,55 @@
                     'F Y',
                 );
             @endphp
-            <div class="bg-white rounded-xl border border-cream-200 shadow-sm p-4 flex items-center gap-4 flex-wrap">
+            <div
+                class="bg-white rounded-xl border border-cream-200 shadow-sm p-4 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex items-start sm:items-center gap-3 sm:gap-4 w-full sm:flex-1 min-w-0">
+                    <div
+                        class="w-11 h-11 rounded-lg bg-slateblue-100 text-slateblue-600 flex items-center justify-center shrink-0">
+                        @include('partial.icons.receipt', ['class' => 'w-5 h-5'])
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-cream-900 truncate">
+                            {{ $nama }}
+                            <span
+                                class="inline-block mt-1 sm:mt-0 sm:ml-1 bg-cream-100 text-cream-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                                Kamar {{ $kamar }}
+                            </span>
+                        </p>
+                        <p class="text-[11px] text-cream-600 mt-0.5 truncate">Pembayaran Kos &bull; Bulan
+                            {{ $bulanLabel }}</p>
+                        <p class="text-sm font-bold text-cream-900 mt-1">
+                            Rp{{ number_format($p->tagihan->jumlah, 0, ',', '.') }}</p>
+                    </div>
+                </div>
                 <div
-                    class="w-11 h-11 rounded-lg bg-slateblue-100 text-slateblue-600 flex items-center justify-center shrink-0">
-                    @include('partial.icons.receipt', ['class' => 'w-5 h-5'])
-                </div>
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-cream-900">
-                        {{ $nama }}
-                        <span
-                            class="ml-1 bg-cream-100 text-cream-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">Kamar
-                            {{ $kamar }}</span>
-                    </p>
-                    <p class="text-[11px] text-cream-600 mt-0.5">Pembayaran Kos &bull; Bulan {{ $bulanLabel }}</p>
-                    <p class="text-sm font-bold text-cream-900 mt-1">Rp{{ number_format($p->tagihan->jumlah, 0, ',', '.') }}
-                    </p>
-                </div>
-                <div class="flex gap-2 shrink-0">
+                    class="grid grid-cols-2 sm:flex sm:flex-row gap-2 shrink-0 w-full sm:w-auto pt-3 sm:pt-0 border-t border-cream-100 sm:border-0">
                     <button onclick="openDetailModal({{ $p->id }})"
-                        class="flex items-center gap-1.5 text-xs font-medium text-sage-700 bg-sage-100 px-3.5 py-2 rounded-lg hover:bg-sage-200 transition-colors duration-150">
+                        class="col-span-2 sm:col-span-1 flex items-center justify-center gap-1.5 text-xs font-medium text-sage-700 bg-sage-100 px-3.5 py-2.5 sm:py-2 rounded-lg hover:bg-sage-200 transition-colors duration-150">
                         Lihat Bukti
                     </button>
                     <button onclick="openRejectModal({{ $p->id }})"
-                        class="text-xs font-medium text-terracotta-600 bg-terracotta-50 px-3.5 py-2 rounded-lg hover:bg-terracotta-100 transition-colors duration-150">
+                        class="flex items-center justify-center text-xs font-medium text-terracotta-600 bg-terracotta-50 px-3.5 py-2.5 sm:py-2 rounded-lg hover:bg-terracotta-100 transition-colors duration-150">
                         Tolak
                     </button>
                     <button onclick="openAcceptModal({{ $p->id }})"
-                        class="text-xs font-medium text-white bg-sage-700 px-3.5 py-2 rounded-lg hover:bg-sage-800 transition-colors duration-150">
+                        class="flex items-center justify-center text-xs font-medium text-white bg-sage-700 px-3.5 py-2.5 sm:py-2 rounded-lg hover:bg-sage-800 transition-colors duration-150">
                         Terima
                     </button>
                 </div>
+
             </div>
         @empty
             <div class="px-5 py-10 text-center">
-
                 <div class="mx-auto w-10 h-10 rounded-full bg-sage-50 text-sage-600 flex items-center justify-center">
                     @include('partial.icons.shield', ['class' => 'w-5 h-5'])
                 </div>
-
                 <p class="mt-3 text-sm font-medium text-cream-800">
                     Tidak ada pembayaran menunggu verifikasi
                 </p>
-
                 <p class="mt-1 text-xs text-cream-600 max-w-xs mx-auto leading-relaxed">
                     Semua pembayaran sudah diperiksa. Pengajuan baru akan muncul di sini.
                 </p>
-
             </div>
         @endforelse
     </div>
@@ -90,15 +93,20 @@
                 $kamar = $p->tagihan->penghunian->kamar->nomor_kamar ?? '-';
                 $isSuccess = $p->status_verifikasi === 'success';
             @endphp
-            <div class="riwayat-item bg-white rounded-xl border border-cream-200 shadow-sm p-4 flex items-center gap-4">
+            <div
+                class="riwayat-item bg-white rounded-xl border border-cream-200 shadow-sm p-4 flex items-start sm:items-center gap-3 sm:gap-4">
                 <div
                     class="w-11 h-11 rounded-lg {{ $isSuccess ? 'bg-sage-100 text-sage-700' : 'bg-terracotta-100 text-terracotta-600' }} flex items-center justify-center shrink-0">
                     @include('partial.icons.receipt', ['class' => 'w-5 h-5'])
                 </div>
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm font-semibold text-cream-900">{{ $nama }} <span
-                            class="ml-1 bg-cream-100 text-cream-600 text-[10px] font-semibold px-2 py-0.5 rounded-full">Kamar
-                            {{ $kamar }}</span></p>
+                    <p class="text-sm font-semibold text-cream-900 truncate">
+                        {{ $nama }}
+                        <span
+                            class="inline-block sm:inline sm:ml-1 bg-cream-100 text-cream-600 text-[10px] font-semibold px-2 py-0.5 mt-1 sm:mt-0 rounded-full">
+                            Kamar {{ $kamar }}
+                        </span>
+                    </p>
                     <p class="text-[11px] text-cream-600 mt-0.5">Rp{{ number_format($p->tagihan->jumlah, 0, ',', '.') }}
                     </p>
                     @if (!$isSuccess && $p->alasan_penolakan)
@@ -106,7 +114,7 @@
                     @endif
                 </div>
                 <span
-                    class="shrink-0 {{ $isSuccess ? 'bg-sage-100 text-sage-700' : 'bg-terracotta-100 text-terracotta-600' }} text-[10px] font-semibold px-3 py-1.5 rounded-full">
+                    class="shrink-0 {{ $isSuccess ? 'bg-sage-100 text-sage-700' : 'bg-terracotta-100 text-terracotta-600' }} text-[10px] font-semibold px-3 py-1.5 rounded-full mt-1 sm:mt-0">
                     {{ $isSuccess ? 'Diterima' : 'Ditolak' }}
                 </span>
             </div>
@@ -269,7 +277,6 @@
 
             if (currentPage > totalPages) currentPage = totalPages;
 
-            // Atur visibilitas data item
             items.forEach((item, i) => {
                 const page = Math.floor(i / PAGE_SIZE) + 1;
                 item.style.display = (page === currentPage) ? '' : 'none';
@@ -287,7 +294,6 @@
 
             let html = '';
 
-            // Tombol Previous
             const prevDisabled = currentPage === 1;
             html += `
                 <button onclick="changePage(-1)" ${prevDisabled ? 'disabled' : ''}
@@ -302,7 +308,6 @@
                 </button>
             `;
 
-            // Tombol Nomor Halaman
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     html += `
@@ -320,7 +325,6 @@
                 }
             }
 
-            // Tombol Next
             const nextDisabled = currentPage === totalPages;
             html += `
                 <button onclick="changePage(1)" ${nextDisabled ? 'disabled' : ''}

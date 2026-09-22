@@ -11,6 +11,7 @@
 @endphp
 
 @section('page-title')
+    @include('partial.tenant-status-banner')
     <span class="flex items-center gap-3">
         <span>{{ $greeting }}, {{ auth()->user()->name }}!</span>
         <span class="hidden sm:inline-flex p-2 rounded-2xl text-sage-700 animate-bounce duration-1000">
@@ -61,18 +62,18 @@
 
                 <div class="relative z-10">
                     <div class="flex items-start justify-between gap-3">
-                        <div class="flex items-center gap-3.5">
+                        <div class="flex items-center gap-3.5 min-w-0">
                             <div
                                 class="w-12 h-12 rounded-2xl {{ $iconBg }} flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 hover:scale-105">
                                 @include('partial.icons.warning', ['class' => 'w-6 h-6'])
                             </div>
-                            <div>
+                            <div class="min-w-0">
                                 <p class="text-xs font-bold text-cream-500 tracking-wider">Status Tagihan</p>
-                                <p class="text-base font-extrabold text-cream-900">Periode {{ $bulanLabel }}</p>
+                                <p class="text-base font-extrabold text-cream-900 truncate">Periode {{ $bulanLabel }}</p>
                             </div>
                         </div>
                         <span
-                            class="{{ $badgeClass }} text-[11px] font-extrabold px-3.5 py-1.5 rounded-full shrink-0 shadow-2xs">{{ $badgeLabel }}</span>
+                            class="{{ $badgeClass }} text-[10px] sm:text-[11px] font-extrabold px-3 py-1.5 rounded-full shrink-0 shadow-2xs text-center leading-tight">{{ $badgeLabel }}</span>
                     </div>
 
                     <div class="mt-6 flex items-baseline gap-2">
@@ -80,8 +81,9 @@
                             {{ number_format($tagihanHero->jumlah, 0, ',', '.') }}</span>
                     </div>
                     <p class="mt-1 text-xs text-cream-600 font-medium flex items-center gap-1.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-sage-500"></span>
-                        Kamar {{ $tagihanHero->penghunian->kamar->nomor_kamar ?? '-' }} &bull; Belum lunas
+                        <span class="w-1.5 h-1.5 rounded-full bg-sage-500 shrink-0"></span>
+                        <span class="truncate">Kamar {{ $tagihanHero->penghunian->kamar->nomor_kamar ?? '-' }} &bull; Belum
+                            lunas</span>
                     </p>
 
                     @if ($tagihanHero->status_pembayaran === 'ditolak' && $ditolakHero)
@@ -89,7 +91,7 @@
                             class="mt-4 bg-terracotta-50/95 backdrop-blur-sm border border-terracotta-200 text-terracotta-800 text-xs rounded-2xl p-4 shadow-2xs">
                             <p class="font-bold flex items-center gap-2 mb-1 text-terracotta-900">
                                 @include('partial.icons.warning', [
-                                    'class' => 'w-4 h-4 text-terracotta-600',
+                                    'class' => 'w-4 h-4 text-terracotta-600 shrink-0',
                                 ])
                                 Alasan Pembayaran Ditolak:
                             </p>
@@ -97,51 +99,124 @@
                         </div>
                     @endif
 
-                    <div class="mt-6 flex flex-wrap gap-3 pt-5 border-t border-cream-200/60">
+                    <div class="mt-6 flex flex-col sm:flex-row gap-2.5 pt-5 border-t border-cream-200/60">
                         @if ($tagihanHero->status_pembayaran !== 'menunggu_verifikasi')
                             <a href="{{ route('penghuni.tagihan.index') }}"
-                                class="flex items-center gap-2 bg-sage-700 text-white text-xs font-semibold px-5 py-3 rounded-xl hover:bg-sage-800 hover:shadow-lg active:scale-[0.98] transition-all duration-150 ease-out shadow-md shadow-sage-700/20">
+                                class="w-full sm:w-auto text-center flex items-center justify-center gap-2 bg-sage-700 text-white text-xs font-semibold px-5 py-3 rounded-xl hover:bg-sage-800 hover:shadow-lg active:scale-[0.98] transition-all duration-150 ease-out shadow-md shadow-sage-700/20">
                                 @include('partial.icons.receipt', ['class' => 'w-4 h-4'])
                                 Upload Bukti Pembayaran
                             </a>
                         @endif
                         <a href="{{ route('penghuni.tagihan.index') }}"
-                            class="flex items-center gap-2 bg-white/80 backdrop-blur-sm border border-cream-300 text-cream-700 text-xs font-semibold px-5 py-3 rounded-xl hover:bg-white hover:border-cream-400 transition-all duration-150 shadow-2xs">
+                            class="w-full sm:w-auto text-center flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm border border-cream-300 text-cream-700 text-xs font-semibold px-5 py-3 rounded-xl hover:bg-white hover:border-cream-400 transition-all duration-150 shadow-2xs">
                             Rincian Tagihan
                         </a>
                     </div>
                 </div>
             @else
                 <div class="relative z-10 flex flex-col items-center justify-center py-8 text-center">
-                    <div
-                        class="w-16 h-16 rounded-3xl bg-sage-100 text-sage-700 ring-8 ring-sage-50 flex items-center justify-center mb-4 shadow-sm">
-                        @include('partial.icons.shield', ['class' => 'w-8 h-8'])
-                    </div>
-                    <p class="text-lg font-extrabold text-sage-900">Semua Tagihan Sudah Lunas!</p>
-                    <p class="mt-1 text-xs text-cream-600 max-w-sm leading-relaxed">Terima kasih sudah membayar tepat waktu.
-                        Kamu bisa beristirahat dengan tenang tanpa ada tanggungan.</p>
+                    @if (in_array($tenantStatus, ['unassigned', 'no_record']))
+                        <div
+                            class="w-16 h-16 rounded-3xl bg-cream-100 text-cream-600 ring-8 ring-cream-50 flex items-center justify-center mb-4 shadow-sm">
+                            @include('partial.icons.receipt', ['class' => 'w-8 h-8'])
+                        </div>
+                        <p class="text-lg font-extrabold text-cream-900">Belum Ada Tagihan</p>
+                        <p class="mt-1 text-xs text-cream-600 max-w-sm leading-relaxed">Tagihan akan muncul setelah Anda
+                            ditempatkan ke kamar.</p>
+                    @elseif ($tenantStatus === 'checked_out')
+                        <div
+                            class="w-16 h-16 rounded-3xl bg-cream-100 text-cream-600 ring-8 ring-cream-50 flex items-center justify-center mb-4 shadow-sm">
+                            @include('partial.icons.receipt', ['class' => 'w-8 h-8'])
+                        </div>
+                        <p class="text-lg font-extrabold text-cream-900">Tidak Ada Tagihan Aktif</p>
+                        <p class="mt-1 text-xs text-cream-600 max-w-sm leading-relaxed">Masa tinggal Anda sudah berakhir,
+                            sehingga tidak ada tagihan berjalan.</p>
+                    @else
+                        @php
+                            $hasPaidHistory = \App\Models\Tagihan::whereHas(
+                                'penghunian',
+                                fn($q) => $q->where('user_id', auth()->id()),
+                            )
+                                ->where('status_pembayaran', 'lunas')
+                                ->exists();
+                        @endphp
+
+                        @if ($hasPaidHistory)
+                            <div
+                                class="w-16 h-16 rounded-3xl bg-sage-100 text-sage-700 ring-8 ring-sage-50 flex items-center justify-center mb-4 shadow-sm">
+                                @include('partial.icons.shield', ['class' => 'w-8 h-8'])
+                            </div>
+                            <p class="text-lg font-extrabold text-sage-900">Semua Tagihan Sudah Lunas!</p>
+                            <p class="mt-1 text-xs text-cream-600 max-w-sm leading-relaxed">Terima kasih sudah membayar
+                                tepat
+                                waktu. Kamu bisa beristirahat dengan tenang tanpa ada tanggungan.</p>
+                        @else
+                            <div
+                                class="w-16 h-16 rounded-3xl bg-sage-100 text-sage-700 ring-8 ring-sage-50 flex items-center justify-center mb-4 shadow-sm">
+                                @include('partial.icons.receipt', ['class' => 'w-8 h-8'])
+                            </div>
+                            <p class="text-lg font-extrabold text-sage-900">Belum Ada Tagihan Bulan Ini</p>
+                            <p class="mt-1 text-xs text-cream-600 max-w-sm leading-relaxed">Belum ada tagihan aktif atau tagihan baru dari pengelola. Santai dulu!</p>
+                        @endif
+                    @endif
                 </div>
             @endif
         </div>
 
         <div class="space-y-4">
-            <a href="{{ route('penghuni.keluhan.index') }}"
-                class="group relative overflow-hidden block bg-white rounded-2xl border border-cream-200/80 shadow-md p-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out">
+            @if ($keluhanAktifCount > 0)
+                <a href="{{ route('penghuni.keluhan.index') }}"
+                    class="group relative overflow-hidden block bg-white rounded-2xl border border-cream-200/80 shadow-md p-4 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-out">
 
-                <div class="flex items-center gap-3.5 relative z-10">
+                    <div class="flex items-center gap-3.5 relative z-10">
+                        <div
+                            class="w-11 h-11 rounded-2xl bg-terracotta-100 text-terracotta-600 ring-4 ring-terracotta-50 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:bg-terracotta-500 group-hover:text-white transition-all duration-300">
+                            @include('partial.icons.wrench', ['class' => 'w-5 h-5'])
+                        </div>
+                        <div>
+                            <p
+                                class="text-2xl font-extrabold text-cream-900 tracking-tight group-hover:text-terracotta-700 transition-colors duration-200">
+                                {{ $keluhanAktifCount }}</p>
+                            <p class="text-xs font-medium text-cream-600">Keluhan Aktif &bull; <span
+                                    class="text-terracotta-600 group-hover:underline">Pantau &rarr;</span></p>
+                        </div>
+                    </div>
+                </a>
+            @else
+                <div class="relative flex items-center py-2">
+                    <div class="relative z-20 shrink-0 -mr-6 -translate-y-12">
+                        <div
+                            class="w-11 h-11 rounded-full
+                       bg-terracotta-100
+                       text-terracotta-700
+                       ring-[5px] ring-cream-50
+                       shadow-[0_10px_24px_rgba(0,0,0,0.12)]
+                       flex items-center justify-center transition-all duration-300">
+
+                            @include('partial.icons.wrench', ['class' => 'w-6 h-6'])
+
+                        </div>
+                    </div>
+
                     <div
-                        class="w-11 h-11 rounded-2xl bg-terracotta-100 text-terracotta-600 ring-4 ring-terracotta-50 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-110 group-hover:bg-terracotta-500 group-hover:text-white transition-all duration-300">
-                        @include('partial.icons.wrench', ['class' => 'w-5 h-5'])
+                        class="flex-1 bg-white border border-terracotta-100 rounded-tr-[40px] rounded-br-[40px] rounded-bl-[40px] rounded-tl-none py-3.5 pl-10 pr-5 shadow-[0_8px_24px_rgba(0,0,0,0.08)]">
+                        <p class="text-base font-semibold text-cream-900">
+                            Ada kendala di kamar atau kos?
+                        </p>
+
+                        <p class="mt-1 text-xs leading-relaxed text-cream-600">
+                            Jangan ragu untuk
+                            <a href="{{ route('penghuni.keluhan.index') }}"
+                                class="font-semibold text-terracotta-700 underline underline-offset-2 hover:text-terracotta-800 transition-colors">
+                                sampaikan keluhanmu
+                            </a>
+                            biar tim teknisi bisa segera bantu perbaiki.
+                        </p>
+
                     </div>
-                    <div>
-                        <p
-                            class="text-2xl font-extrabold text-cream-900 tracking-tight group-hover:text-terracotta-700 transition-colors duration-200">
-                            {{ $keluhanAktifCount }}</p>
-                        <p class="text-xs font-medium text-cream-600">Keluhan Aktif &bull; <span
-                                class="text-terracotta-600 group-hover:underline">Pantau &rarr;</span></p>
-                    </div>
+
                 </div>
-            </a>
+            @endif
 
             @if ($pengumumanTerbaru)
                 <a href="{{ route('penghuni.pengumuman.index') }}"
@@ -190,23 +265,28 @@
                         ?->alasan_penolakan;
                 @endphp
                 <div
-                    class="bg-terracotta-50 border border-terracotta-200 rounded-2xl shadow-sm p-4 flex items-center justify-between gap-4 flex-wrap">
-                    <div class="flex items-center gap-3.5 min-w-0">
+                    class="bg-terracotta-50 border border-terracotta-200 rounded-2xl shadow-sm p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+
+                    <div class="flex items-start sm:items-center gap-3.5 min-w-0">
                         <div
-                            class="w-10 h-10 rounded-2xl bg-terracotta-100 text-terracotta-600 ring-4 ring-terracotta-100/50 flex items-center justify-center shrink-0">
+                            class="w-10 h-10 rounded-2xl bg-terracotta-100 text-terracotta-600 ring-4 ring-terracotta-100/50 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
                             @include('partial.icons.warning', ['class' => 'w-5 h-5'])
                         </div>
                         <div class="min-w-0">
-                            <p class="text-sm font-bold text-terracotta-800">Bukti Pembayaran Ditolak &mdash;
-                                {{ $bulanLabelDitolak }}</p>
-                            <p class="text-xs text-terracotta-700 mt-0.5"><span class="font-semibold">Alasan:</span>
-                                {{ $alasanLain ?? '-' }}</p>
+                            <p class="text-sm font-bold text-terracotta-800 truncate">
+                                Bukti Pembayaran Ditolak &mdash; {{ $bulanLabelDitolak }}
+                            </p>
+                            <p class="text-xs text-terracotta-700 mt-0.5 leading-relaxed">
+                                <span class="font-semibold">Alasan:</span> {{ $alasanLain ?? '-' }}
+                            </p>
                         </div>
                     </div>
+
                     <a href="{{ route('penghuni.tagihan.index') }}"
-                        class="shrink-0 text-xs font-bold text-terracotta-700 bg-white border border-terracotta-300 rounded-xl px-4 py-2.5 hover:bg-terracotta-100 transition-colors duration-150 shadow-2xs">
+                        class="w-full sm:w-auto text-center shrink-0 text-xs font-bold text-terracotta-700 bg-white border border-terracotta-300 rounded-xl px-4 py-2.5 hover:bg-terracotta-100 transition-colors duration-150 shadow-2xs">
                         Upload Ulang
                     </a>
+
                 </div>
             @endforeach
         </div>
